@@ -50,7 +50,8 @@ def load_model_and_tokenizer(
         model_args.model_name_or_path,
         use_fast=model_args.use_fast_tokenizer,
         split_special_tokens=model_args.split_special_tokens,
-        padding_side="right",
+        # padding_side="right",
+        padding_side="left", # For Mixtral
         **config_kwargs
     )
     patch_tokenizer(tokenizer)

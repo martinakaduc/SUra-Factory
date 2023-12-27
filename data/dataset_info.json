@@ -302,5 +302,38 @@
       "prompt": "content"
     },
     "folder": "python"
+  },
+  "wikipedia_vi": {
+    "hf_hub_url": "wikimedia/wikipedia",
+    "subset": "20231101.vi",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "news_corpus_vi": {
+    "hf_hub_url": "bigscience-data/roots_vi_binhvq_news_corpus",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "culturax_vi": {
+    "hf_hub_url": "uonlp/CulturaX",
+    "subset": "vi",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "orca_dpo_pairs_vi": {
+    "script_url": "orca_dpo_pairs_vi",
+    "columns": {
+      "system": "system",
+      "prompt": "question",
+      "response": "response"
+    },
+    "ranking": true
+  },
+  "rlaif-nectar": {
+    "hf_hub_url": "AstraMindAI/RLAIF-Nectar",
+    "ranking": true
   }
 }
