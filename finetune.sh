@@ -193,6 +193,8 @@ python src/export_model.py \
     --template mistral \
     --finetuning_type lora \
     --flash_attn True \
+    --export_size 5 \
+    --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra-wiki
 
 python src/export_model.py \
@@ -202,6 +204,8 @@ python src/export_model.py \
     --template mistral \
     --finetuning_type lora \
     --flash_attn True \
+    --export_size 5 \
+    --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra-orca-dpo
 
 
@@ -273,6 +277,8 @@ python src/export_model.py \
     --flash_attn True \
     --template llama2 \
     --finetuning_type lora \
+    --export_size 5 \
+    --export_legacy_format False \
     --export_dir models/ura-hcmut/ura-llama-7b-wiki
     
 # 4xA100 80GB
@@ -318,6 +324,8 @@ python src/export_model.py \
     --flash_attn True \
     --template llama2 \
     --finetuning_type lora \
+    --export_size 5 \
+    --export_legacy_format False \
     --export_dir models/ura-hcmut/ura-llama-7b-dpo
     
 python src/cli_demo.py \
