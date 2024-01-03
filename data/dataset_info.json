@@ -335,5 +335,11 @@
   "rlaif-nectar": {
     "hf_hub_url": "AstraMindAI/RLAIF-Nectar",
     "ranking": true
+  },
+  "alpaca_vi": {
+    "hf_hub_url": "nRuaif/Vietnamese_x_Alpaca"
+  },
+  "coccoc_sft_rag": {
+    "hf_hub_url": "ura-hcmut/cococ_sft_rag"
   }
 }

@@ -11,7 +11,7 @@ export NEPTUNE_PROJECT="martinakaduc/VIURA"
 export LIBRARY_PATH=/llm_quangduc/miniconda3/envs/mixsura2/lib/python3.10/site-packages/torch/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/llm_quangduc/miniconda3/envs/mixsura2/lib/python3.10/site-packages/torch/lib:$LD_LIBRARY_PATH
 # Optional
-# export OMP_NUM_THREADS=8
+# export OMP_NUM_THREADS=1
 
 # Find links to system library of CUDA
 # ldconfig -v 2>/dev/null | grep -v ^$'\t'
@@ -152,7 +152,7 @@ accelerate launch src/train_bash.py \
 accelerate launch src/train_bash.py \
     --stage pt \
     --do_train True \
-    --model_name_or_path models/ura-hcmut/MixSUra-orca-dpo \
+    --model_name_or_path models/ura-hcmut/MixSUra-qkvo \
     --use_fast_tokenizer True \
     --finetuning_type lora \
     --template mistral \
@@ -177,7 +177,7 @@ accelerate launch src/train_bash.py \
     --lora_alpha 512 \
     --lora_dropout 0.1 \
     --lora_target q_proj,k_proj,v_proj,o_proj \
-    --output_dir saves/MixSUra-qkvo \
+    --output_dir saves/MixSUra-qkvo-1 \
     --save_total_limit 5 \
     --plot_loss True \
     --report_to neptune
@@ -208,7 +208,29 @@ python src/export_model.py \
     --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra-orca-dpo
 
+python src/export_model.py \
+    --model_name_or_path models/ura-hcmut/MixSUra-orca-dpo \
+    --adapter_name_or_path saves/MixSUra-qkvo/checkpoint-20 \
+    --use_fast_tokenizer True \
+    --template mistral \
+    --finetuning_type lora \
+    --flash_attn True \
+    --export_size 5 \
+    --export_legacy_format False \
+    --export_dir models/ura-hcmut/MixSUra-qkvo
 
+python src/export_model.py \
+    --model_name_or_path models/ura-hcmut/MixSUra-qkvo \
+    --adapter_name_or_path saves/MixSUra-qkvo-1/final \
+    --use_fast_tokenizer True \
+    --template mistral \
+    --finetuning_type lora \
+    --flash_attn True \
+    --export_size 5 \
+    --export_legacy_format False \
+    --export_dir models/ura-hcmut/MixSUra-qkvo-1
+    
+    
 ## DEPLOY MODELS ##
 python src/web_demo.py \
     --model_name_or_path models/ura-hcmut/MixSUra-orca-dpo \
@@ -225,9 +247,16 @@ python src/cli_demo.py \
     --finetuning_type lora
 
 text-generation-launcher \
+    --model-id mistralai/Mixtral-8x7B-Instruct-v0.1 \
+    --port 10025 \
+    --max-input-length 24576 \
+    --max-total-tokens 32768 \
+    --max-batch-prefill-tokens 32768
+
+text-generation-launcher \
     --model-id ./ \
     --port 10025 \
-    --max-input-length 30720 \
+    --max-input-length 24576 \
     --max-total-tokens 32768 \
     --max-batch-prefill-tokens 32768
 
