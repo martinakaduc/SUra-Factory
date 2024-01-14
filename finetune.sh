@@ -3,8 +3,9 @@
 # deepspeed==0.12.3
 # flash-attn==2.4.1
 # neptune
+# autoawq: pip install https://github.com/casper-hansen/AutoAWQ/releases/download/v0.1.8/autoawq-0.1.8+cu118-cp310-cp310-linux_x86_64.whl
 # ** If installing torch==2.1.0 ==> re-install DeepSpeed 0.12.6 & manually build flash-attn 2.4.1
-# pip install "unsloth[cu118_ampere] @ git+https://github.com/unslothai/unsloth.git"
+# unsloth: pip install "unsloth[cu118_ampere] @ git+https://github.com/unslothai/unsloth.git"
 
 export NEPTUNE_API_TOKEN="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIwMTdmNWZlYy1lMTVjLTQyZWEtOTY5ZS1hOWM3ZmMyMjJjZTQifQ=="
 export NEPTUNE_PROJECT="martinakaduc/VIURA"
@@ -35,6 +36,19 @@ accelerate config
 # - Number of GPUs: [Number_available_GPUs]
 # - Dtype: BF16
 
+## TRAINING NEW TOKENIZER ##
+python src/train_tokenizer.py \
+    --model_name_or_path mistralai/Mixtral-8x7B-Instruct-v0.1 \
+    --tokenizer_path tokenizers/ura-hcmut/MixSUra-tokenizer \
+    --dataset wikipedia_vi \
+    --batch_size 4096
+
+python src/resize_model_emb.py \
+    --model_name_or_path mistralai/Mixtral-8x7B-Instruct-v0.1 \
+    --tokenizer_path tokenizers/ura-hcmut/MixSUra-tokenizer_merged \
+    --export_dir models/ura-hcmut/MixSUra-v0
+
+
 ## PRE-TRAINING ##
 ## 4xA100 40GB ###
 accelerate launch src/train_bash.py \
@@ -47,6 +61,7 @@ accelerate launch src/train_bash.py \
     --flash_attn True \
     --dataset_dir data \
     --dataset wikipedia_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 32768 \
     --num_train_epochs 1.0 \
     --max_samples 2000000 \
@@ -66,7 +81,7 @@ accelerate launch src/train_bash.py \
     --lora_alpha 512 \
     --lora_dropout 0.1 \
     --lora_target q_proj,v_proj \
-    --output_dir MixSUra-wiki-test \
+    --output_dir saves/MixSUra-wiki \
     --save_total_limit 5 \
     --plot_loss True
 
@@ -84,6 +99,7 @@ accelerate launch src/train_bash.py \
     --flash_attn True \
     --dataset_dir data \
     --dataset orca_dpo_pairs_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 32768 \
     --num_train_epochs 1.0 \
     --max_samples 2000000 \
@@ -112,7 +128,42 @@ accelerate launch src/train_bash.py \
 
 # Test QKVO
 # 4xA100 40GB #
+#   --disable_gradient_checkpointing True \
 # Set padding_side="left"
+accelerate launch src/train_bash.py \
+    --stage pt \
+    --do_train True \
+    --model_name_or_path models/ura-hcmut/MixSUra-qkvo-1 \
+    --use_fast_tokenizer True \
+    --finetuning_type lora \
+    --template mistral \
+    --flash_attn True \
+    --dataset_dir data \
+    --dataset news_corpus_vi \
+    --preprocessing_num_workers 32 \
+    --cutoff_len 32768 \
+    --num_train_epochs 1.0 \
+    --bf16 True \
+    --tf32 False \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 256 \
+    --learning_rate 5e-05 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --weight_decay 0.001 \
+    --logging_steps 1 \
+    --warmup_ratio 0.03 \
+    --save_steps 2 \
+    --neftune_noise_alpha 0 \
+    --lora_rank 256 \
+    --lora_alpha 512 \
+    --lora_dropout 0.1 \
+    --lora_target q_proj,k_proj,v_proj,o_proj \
+    --output_dir saves/MixSUra-qkvo-2 \
+    --save_total_limit 5 \
+    --plot_loss True \
+    --report_to neptune
+
 accelerate launch src/train_bash.py \
     --stage dpo \
     --do_train True \
@@ -123,13 +174,13 @@ accelerate launch src/train_bash.py \
     --flash_attn True \
     --dataset_dir data \
     --dataset orca_dpo_pairs_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 32768 \
     --num_train_epochs 1.0 \
     --bf16 True \
     --tf32 False \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 256 \
-    --disable_gradient_checkpointing True \
     --learning_rate 5e-05 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
@@ -149,22 +200,25 @@ accelerate launch src/train_bash.py \
     --report_to neptune
 
 
+## TEST FREEZE ##
 accelerate launch src/train_bash.py \
     --stage pt \
     --do_train True \
-    --model_name_or_path models/ura-hcmut/MixSUra-qkvo \
+    --model_name_or_path models/ura-hcmut/MixSUra-v0 \
     --use_fast_tokenizer True \
-    --finetuning_type lora \
+    --finetuning_type freeze-a2e \
     --template mistral \
     --flash_attn True \
     --dataset_dir data \
     --dataset wikipedia_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 32768 \
     --num_train_epochs 1.0 \
+    --max_samples 2000000 \
     --bf16 True \
     --tf32 False \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 256 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 128 \
     --learning_rate 5e-05 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
@@ -173,17 +227,11 @@ accelerate launch src/train_bash.py \
     --warmup_ratio 0.03 \
     --save_steps 2 \
     --neftune_noise_alpha 0 \
-    --lora_rank 256 \
-    --lora_alpha 512 \
-    --lora_dropout 0.1 \
-    --lora_target q_proj,k_proj,v_proj,o_proj \
-    --output_dir saves/MixSUra-qkvo-1 \
+    --name_module_trainable embed_tokens,lm_head \
+    --output_dir MixSUra-v0.1 \
     --save_total_limit 5 \
-    --plot_loss True \
-    --report_to neptune
-
-
-
+    --plot_loss True
+    
 
 ## EXPORT MODELS ##
 python src/export_model.py \
@@ -230,7 +278,14 @@ python src/export_model.py \
     --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra-qkvo-1
     
-    
+
+
+## QUANTIZE MODELS ##
+python src/quantize_model.py \
+    --model_name_or_path models/ura-hcmut/MixSUra-qkvo-1 \
+    --quantization_path models/ura-hcmut/MixSUra-AWQ
+
+
 ## DEPLOY MODELS ##
 python src/web_demo.py \
     --model_name_or_path models/ura-hcmut/MixSUra-orca-dpo \
@@ -249,14 +304,14 @@ python src/cli_demo.py \
 text-generation-launcher \
     --model-id mistralai/Mixtral-8x7B-Instruct-v0.1 \
     --port 10025 \
-    --max-input-length 24576 \
+    --max-input-length 28672 \
     --max-total-tokens 32768 \
     --max-batch-prefill-tokens 32768
 
 text-generation-launcher \
     --model-id ./ \
     --port 10025 \
-    --max-input-length 24576 \
+    --max-input-length 28672 \
     --max-total-tokens 32768 \
     --max-batch-prefill-tokens 32768
 
@@ -276,6 +331,7 @@ accelerate launch src/train_bash.py \
     --flash_attn True \
     --dataset_dir data \
     --dataset wikipedia_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 4096 \
     --num_train_epochs 1.0 \
     --max_samples 2000000 \
@@ -322,6 +378,7 @@ accelerate launch src/train_bash.py \
     --flash_attn True \
     --dataset_dir data \
     --dataset orca_dpo_pairs_vi \
+    --preprocessing_num_workers 32 \
     --cutoff_len 4096 \
     --num_train_epochs 5.0 \
     --max_samples 2000000 \

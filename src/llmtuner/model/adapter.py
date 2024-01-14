@@ -60,7 +60,15 @@ def init_adapter(
                 param.requires_grad_(False)
             else:
                 param.data = param.data.to(torch.float32)
-
+                
+    if finetuning_args.finetuning_type == "freeze-a2e" and is_trainable:
+        logger.info("Fine-tuning method: Freeze all except embeddings")
+        for name, param in model.named_parameters():
+            if not any(trainable_module in name for trainable_module in finetuning_args.name_module_trainable):
+                param.requires_grad_(False)
+            else:
+                param.data = param.data.to(torch.float32)
+        
     if finetuning_args.finetuning_type == "lora":
         logger.info("Fine-tuning method: LoRA")
         adapter_to_resume = None

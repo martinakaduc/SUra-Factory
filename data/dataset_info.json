@@ -304,8 +304,7 @@
     "folder": "python"
   },
   "wikipedia_vi": {
-    "hf_hub_url": "wikimedia/wikipedia",
-    "subset": "20231101.vi",
+    "script_url": "wikipedia_vi",
     "columns": {
       "prompt": "text"
     }
@@ -341,5 +340,15 @@
   },
   "coccoc_sft_rag": {
     "hf_hub_url": "ura-hcmut/cococ_sft_rag"
+  },
+  "mlqa-dpo": {
+    "hf_hub_url": "mlqa-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    },
+    "ranking": true
   }
 }
