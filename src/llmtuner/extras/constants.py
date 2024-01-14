@@ -40,6 +40,10 @@ TRAINING_STAGES = {
     "Pre-Training": "pt"
 }
 
+V_HEAD_WEIGHTS_NAME = "value_head.bin"
+
+V_HEAD_SAFE_WEIGHTS_NAME = "value_head.safetensors"
+
 class DownloadSource(str, Enum):
     DEFAULT = "hf"
     MODELSCOPE = "ms"
@@ -267,6 +271,21 @@ register_model_group(
 
 register_model_group(
     models={
+        "DeepseekMoE-16B-Base": {
+            DownloadSource.DEFAULT: "deepseek-ai/deepseek-moe-16b-base",
+            DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-moe-16b-base"
+        },
+        "DeepseekMoE-16B-Chat": {
+            DownloadSource.DEFAULT: "deepseek-ai/deepseek-moe-16b-chat",
+            DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-moe-16b-chat"
+        }
+    },
+    template="deepseek"
+)
+
+
+register_model_group(
+    models={
         "Falcon-7B": {
             DownloadSource.DEFAULT: "tiiuae/falcon-7b",
             DownloadSource.MODELSCOPE: "AI-ModelScope/falcon-7b"
@@ -439,8 +458,7 @@ register_model_group(
             DownloadSource.DEFAULT: "microsoft/phi-2",
             DownloadSource.MODELSCOPE: "AI-ModelScope/phi-2"
         }
-    },
-    module="Wqkv"
+    }
 )
 
 
@@ -513,6 +531,20 @@ register_model_group(
     },
     module="c_attn",
     template="qwen"
+)
+
+
+register_model_group(
+    models={
+        "SOLAR-10.7B": {
+            DownloadSource.DEFAULT: "upstage/SOLAR-10.7B-v1.0"
+        },
+        "SOLAR-10.7B-Chat": {
+            DownloadSource.DEFAULT: "upstage/SOLAR-10.7B-Instruct-v1.0",
+            DownloadSource.MODELSCOPE: "AI-ModelScope/SOLAR-10.7B-Instruct-v1.0"
+        }
+    },
+    template="solar"
 )
 
 

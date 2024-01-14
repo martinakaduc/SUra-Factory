@@ -1,14 +1,15 @@
 import torch
 import inspect
 from typing import TYPE_CHECKING, Any, Dict, List
+from transformers import PreTrainedModel
 from transformers.utils import cached_file
-from transformers.trainer import WEIGHTS_NAME, SAFE_WEIGHTS_NAME
 
+from llmtuner.extras.constants import V_HEAD_WEIGHTS_NAME, V_HEAD_SAFE_WEIGHTS_NAME
 from llmtuner.extras.logging import get_logger
 from llmtuner.extras.misc import get_current_device
 
 if TYPE_CHECKING:
-    from transformers import PretrainedConfig, PreTrainedModel, PreTrainedTokenizer
+    from transformers import PretrainedConfig, PreTrainedTokenizer
     from llmtuner.hparams import ModelArguments, DataArguments, FinetuningArguments
 
 
@@ -23,12 +24,14 @@ def dispatch_model(model: "PreTrainedModel") -> "PreTrainedModel":
     if getattr(model, "quantization_method", None): # already set on current device
         return model
 
-    if torch.cuda.device_count() > 1 and getattr(model.config, "model_type", None) != "chatglm":
+    if (
+        torch.cuda.device_count() > 1
+        and isinstance(model, PreTrainedModel)
+        and model._no_split_modules is not None
+        and model.config.model_type != "chatglm"
+    ):
         from accelerate import dispatch_model
         from accelerate.utils import infer_auto_device_map, get_balanced_memory
-
-        if model._no_split_modules is None:
-            raise ValueError("The model class needs to implement the `_no_split_modules` attribute.")
 
         kwargs = {"dtype": model.dtype, "no_split_module_classes": model._get_no_split_modules("auto")}
         max_memory = get_balanced_memory(model, **kwargs)
@@ -100,22 +103,20 @@ def load_valuehead_params(path_or_repo_id: str, model_args: "ModelArguments") ->
 
     try:
         from safetensors import safe_open
-        vhead_file = cached_file(filename=SAFE_WEIGHTS_NAME, **kwargs)
+        vhead_file = cached_file(filename=V_HEAD_SAFE_WEIGHTS_NAME, **kwargs)
         with safe_open(vhead_file, framework="pt", device="cpu") as f:
-            return {
-                "v_head.summary.weight": f.get_tensor("v_head.summary.weight"),
-                "v_head.summary.bias": f.get_tensor("v_head.summary.bias")
-            }
+            return {key: f.get_tensor(key) for key in f.keys()}
     except Exception as err:
-        logger.info("Failed to load {}: {}".format(SAFE_WEIGHTS_NAME, str(err)))
+        logger.info("Failed to load {}: {}".format(V_HEAD_SAFE_WEIGHTS_NAME, str(err)))
 
     try:
-        vhead_file = cached_file(filename=WEIGHTS_NAME, **kwargs)
+        vhead_file = cached_file(filename=V_HEAD_WEIGHTS_NAME, **kwargs)
         return torch.load(vhead_file, map_location="cpu")
     except Exception as err:
-        logger.info("Failed to load {}: {}".format(WEIGHTS_NAME, str(err)))
+        logger.info("Failed to load {}: {}".format(V_HEAD_WEIGHTS_NAME, str(err)))
 
-    logger.warning("Provided path ({}) does not contain valuehead weights.".format(path_or_repo_id))
+    logger.info("Provided path ({}) does not contain value head weights.".format(path_or_repo_id))
+    logger.info("Ignore these messages if you are not resuming the training of a value head model.")
     return None
 
 

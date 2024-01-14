@@ -1,5 +1,4 @@
 import tiktoken
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
@@ -224,12 +223,13 @@ def get_template_and_fix_tokenizer(
     template = templates.get(name, None)
     assert template is not None, "Template {} does not exist.".format(name)
 
-    stop_words = deepcopy(template.stop_words)
+    stop_words = template.stop_words
     if template.replace_eos:
         if not stop_words:
             raise ValueError("Stop words are required to replace the EOS token.")
 
-        tokenizer.eos_token = stop_words.pop(0)
+        tokenizer.eos_token = stop_words[0]
+        stop_words = stop_words[1:]
         logger.info("Replace eos token: {}".format(tokenizer.eos_token))
 
     if stop_words:
@@ -601,26 +601,32 @@ register_template(
 register_template(
     name="qwen",
     prefix=[
-        {"token": "<|im_start|>"},
-        "system\n{{system}}"
+        "<|im_start|>system\n{{system}}<|im_end|>"
     ],
     prompt=[
-        {"token": "<|im_start|>"},
-        "user\n{{query}}",
-        {"token": "<|im_end|>"},
-        "\n",
-        {"token": "<|im_start|>"},
-        "assistant\n"
+        "<|im_start|>user\n{{query}}<|im_end|>\n<|im_start|>assistant\n"
     ],
     system="You are a helpful assistant.",
     sep=[
-        {"token": "<|im_end|>"},
         "\n"
     ],
     stop_words=[
         "<|im_end|>"
     ],
-    efficient_eos=True
+    replace_eos=True
+)
+
+
+register_template(
+    name="solar",
+    prefix=[
+        "{{system}}"
+    ],
+    prompt=[
+        "### User:\n{{query}}\n\n### Assistant:\n"
+    ],
+    system="",
+    sep=[]
 )
 
 
@@ -781,15 +787,10 @@ register_template(
 register_template(
     name="zephyr",
     prefix=[
-        {"token": "<|system|>"},
-        "\n{{system}}",
-        {"token": "</s>"}
+        "<|system|>\n{{system}}</s>",
     ],
     prompt=[
-        {"token": "<|user|>"},
-        "\n{{query}}",
-        {"token": "</s>"},
-        {"token": "<|assistant|>"}
+        "<|user|>\n{{query}}</s><|assistant|>"
     ],
     system="You are a friendly chatbot who always responds in the style of a pirate",
     sep=[]
