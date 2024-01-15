@@ -50,8 +50,7 @@ def load_model_and_tokenizer(
         model_args.model_name_or_path,
         use_fast=model_args.use_fast_tokenizer,
         split_special_tokens=model_args.split_special_tokens,
-        # padding_side="right",
-        padding_side="left", # For Mixtral
+        padding_side="right",
         **config_kwargs
     )
     patch_tokenizer(tokenizer)
@@ -69,7 +68,7 @@ def load_model_and_tokenizer(
             "dtype": model_args.compute_dtype,
             "load_in_4bit": model_args.quantization_bit == 4,
             "token": model_args.hf_hub_token,
-            "device_map": get_current_device(),
+            "device_map": None,
             "rope_scaling": getattr(config, "rope_scaling", None)
         }
         if getattr(config, "model_type", None) == "llama":

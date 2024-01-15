@@ -11,6 +11,7 @@ export NEPTUNE_API_TOKEN="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLC
 export NEPTUNE_PROJECT="martinakaduc/VIURA"
 export LIBRARY_PATH=/llm_quangduc/miniconda3/envs/mixsura2/lib/python3.10/site-packages/torch/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/llm_quangduc/miniconda3/envs/mixsura2/lib/python3.10/site-packages/torch/lib:$LD_LIBRARY_PATH
+
 # Optional
 # export OMP_NUM_THREADS=1
 
@@ -320,26 +321,41 @@ text-generation-launcher \
 ############ LLaMa-2 ############
 #################################
 
-# 4xA100 80GB
+## TRAINING NEW TOKENIZER ##
+python src/train_tokenizer.py \
+    --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
+    --tokenizer_path tokenizers/ura-hcmut/ura-llama-tokenizer \
+    --dataset wikipedia_vi \
+    --batch_size 4096
+
+python src/resize_model_emb.py \
+    --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
+    --tokenizer_path tokenizers/ura-hcmut/ura-llama-tokenizer_merged \
+    --export_dir models/ura-hcmut/ura-llama-v0
+    
+# 1xA100 40GB
+# DeepSpeed 2
+# Using unsloth with deepspeed requires turning off Zero.Init
 accelerate launch src/train_bash.py \
     --stage pt \
     --do_train True \
-    --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
+    --model_name_or_path models/ura-hcmut/ura-llama-v0 \
     --use_fast_tokenizer True \
-    --finetuning_type lora \
+    --finetuning_type freeze-a2e \
+    --use_unsloth True \
     --template llama2 \
     --flash_attn True \
     --dataset_dir data \
     --dataset wikipedia_vi \
     --preprocessing_num_workers 32 \
     --cutoff_len 4096 \
-    --num_train_epochs 1.0 \
+    --num_train_epochs 3.0 \
     --max_samples 2000000 \
     --bf16 True \
     --tf32 False \
-    --per_device_train_batch_size 1 \
+    --per_device_train_batch_size 4 \
     --gradient_accumulation_steps 256 \
-    --learning_rate 5e-05 \
+    --learning_rate 1e-4 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
     --weight_decay 0.001 \
@@ -347,13 +363,11 @@ accelerate launch src/train_bash.py \
     --warmup_ratio 0.03 \
     --save_steps 2 \
     --neftune_noise_alpha 0 \
-    --lora_rank 256 \
-    --lora_alpha 512 \
-    --lora_dropout 0.1 \
-    --lora_target q_proj,v_proj \
-    --output_dir saves/ura-llama-7b/wiki-test \
-    --save_total_limit 10 \
-    --plot_loss True
+    --name_module_trainable embed_tokens,lm_head \
+    --output_dir saves/ura-llama-7b/v0.1 \
+    --save_total_limit 5 \
+    --plot_loss True \
+    --report_to neptune
     
 python src/export_model.py \
     --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
@@ -367,13 +381,13 @@ python src/export_model.py \
     --export_dir models/ura-hcmut/ura-llama-7b-wiki
     
 # 4xA100 80GB
-# --use_unsloth True \
 accelerate launch src/train_bash.py \
     --stage dpo \
     --do_train True \
     --model_name_or_path models/ura-hcmut/ura-llama-7b-wiki \
     --use_fast_tokenizer True \
     --finetuning_type lora \
+    --use_unsloth True \
     --template llama2 \
     --flash_attn True \
     --dataset_dir data \
@@ -386,7 +400,7 @@ accelerate launch src/train_bash.py \
     --tf32 False \
     --per_device_train_batch_size 2 \
     --gradient_accumulation_steps 1024 \
-    --learning_rate 5e-05 \
+    --learning_rate 1e-4 \
     --lr_scheduler_type cosine \
     --max_grad_norm 1.0 \
     --weight_decay 0.001 \
