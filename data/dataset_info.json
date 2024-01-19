@@ -309,8 +309,21 @@
       "prompt": "text"
     }
   },
+  "book_bi": {
+    "hf_hub_url": "tinhpx2911/vietnamese_book_10k",
+    "columns": {
+      "prompt": "text"
+    }
+  },
   "news_corpus_vi": {
     "hf_hub_url": "bigscience-data/roots_vi_binhvq_news_corpus",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "oscar_vi": {
+    "hf_hub_url": "oscar-corpus/OSCAR-2301",
+    "subset": "vi",
     "columns": {
       "prompt": "text"
     }
@@ -318,6 +331,36 @@
   "culturax_vi": {
     "hf_hub_url": "uonlp/CulturaX",
     "subset": "vi",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "literature_vi": {
+    "hf_hub_url": "tinhpx2911/vanhoc_processed",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "history_book_vi": {
+    "hf_hub_url": "tinhpx2911/history_book",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "general_data_vi": {
+    "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "truyenfull_vi": {
+    "hf_hub_url": "tinhpx2911/truyenfull_processed",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "vietai_book_vi": {
+    "hf_hub_url": "tinhpx2911/vietai_book_data",
     "columns": {
       "prompt": "text"
     }
@@ -342,11 +385,111 @@
     "hf_hub_url": "ura-hcmut/cococ_sft_rag"
   },
   "mlqa-dpo": {
-    "hf_hub_url": "mlqa-dpo",
+    "hf_hub_url": "ura-hcmut/mlqa-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
       "query": "input",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "xquad_xtreme-dpo": {
+    "hf_hub_url": "ura-hcmut/xquad_xtreme-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "opus100-dpo": {
+    "hf_hub_url": "ura-hcmut/opus100-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "PhoMT-dpo": {
+    "hf_hub_url": "ura-hcmut/PhoMT-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "vietnews-dpo": {
+    "hf_hub_url": "ura-hcmut/vietnews-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "wiki_lingua-dpo": {
+    "hf_hub_url": "ura-hcmut/wiki_lingua-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "synthetic_reasoning-dpo": {
+    "hf_hub_url": "ura-hcmut/synthetic_reasoning-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "synthetic_reasoning_natural-dpo": {
+    "hf_hub_url": "ura-hcmut/synthetic_reasoning_natural-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "VSEC-dpo": {
+    "hf_hub_url": "ura-hcmut/VSEC-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "mlqa_MLM-dpo": {
+    "hf_hub_url": "ura-hcmut/mlqa_MLM-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "math-dpo": {
+    "hf_hub_url": "ura-hcmut/math-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "output"
+    },
+    "ranking": true
+  },
+  "zalo_e2eqa-dpo": {
+    "hf_hub_url": "ura-hcmut/zalo_e2eqa-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
       "response": "output"
     },
     "ranking": true
