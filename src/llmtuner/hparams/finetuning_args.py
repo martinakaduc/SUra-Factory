@@ -55,9 +55,13 @@ class LoraArguments:
                   Phi choices: [\"Wqkv\", \"out_proj\", \"fc1\", \"fc2\"], \
                   Others choices: the same as LLaMA."}
     )
+    lora_bf16_mode: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether or not to train lora adapters in bf16 precision."}
+    )
     create_new_adapter: Optional[bool] = field(
         default=False,
-        metadata={"help": "Whether to create a new adapter with randomly initialized weight or not."}
+        metadata={"help": "Whether or not to create a new adapter with randomly initialized weight."}
     )
 
 
@@ -160,8 +164,6 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments):
         self.lora_alpha = self.lora_alpha or self.lora_rank * 2
         self.lora_target = split_arg(self.lora_target)
         self.additional_target = split_arg(self.additional_target)
-        self.ref_model_adapters = split_arg(self.ref_model_adapters)
-        self.reward_model_adapters = split_arg(self.reward_model_adapters)
 
         assert self.finetuning_type in ["lora", "freeze", "freeze-a2e", "full"], "Invalid fine-tuning method."
         assert self.ref_model_quantization_bit in [None, 8, 4], "We only accept 4-bit or 8-bit quantization."

@@ -5,6 +5,8 @@ from typing import Dict, Optional
 
 CHOICES = ["A", "B", "C", "D"]
 
+DATA_CONFIG = "dataset_info.json"
+
 DEFAULT_MODULE = defaultdict(str)
 
 DEFAULT_TEMPLATE = defaultdict(str)
@@ -225,19 +227,19 @@ register_model_group(
 
 register_model_group(
     models={
-        "DeepseekLLM-7B-Base": {
+        "DeepSeekLLM-7B-Base": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-llm-7b-base",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-llm-7b-base"
         },
-        "DeepseekLLM-67B-Base": {
+        "DeepSeekLLM-67B-Base": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-llm-67b-base",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-llm-67b-base"
         },
-        "DeepseekLLM-7B-Chat": {
+        "DeepSeekLLM-7B-Chat": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-llm-7b-chat",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-llm-7b-chat"
         },
-        "DeepseekLLM-67B-Chat": {
+        "DeepSeekLLM-67B-Chat": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-llm-67b-chat",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-llm-67b-chat"
         }
@@ -248,19 +250,19 @@ register_model_group(
 
 register_model_group(
     models={
-        "DeepseekCoder-6.7B-Base": {
+        "DeepSeekCoder-6.7B-Base": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-coder-6.7b-base",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-coder-6.7b-base"
         },
-        "DeepseekCoder-33B-Base": {
+        "DeepSeekCoder-33B-Base": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-coder-33b-base",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-coder-33b-base"
         },
-        "DeepseekCoder-6.7B-Chat": {
+        "DeepSeekCoder-6.7B-Chat": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-coder-6.7b-instruct",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-coder-6.7b-instruct"
         },
-        "DeepseekCoder-33B-Chat": {
+        "DeepSeekCoder-33B-Chat": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-coder-33b-instruct",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-coder-33b-instruct"
         }
@@ -271,11 +273,11 @@ register_model_group(
 
 register_model_group(
     models={
-        "DeepseekMoE-16B-Base": {
+        "DeepSeekMoE-16B-Base": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-moe-16b-base",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-moe-16b-base"
         },
-        "DeepseekMoE-16B-Chat": {
+        "DeepSeekMoE-16B-Chat": {
             DownloadSource.DEFAULT: "deepseek-ai/deepseek-moe-16b-chat",
             DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-moe-16b-chat"
         }
@@ -336,6 +338,30 @@ register_model_group(
         }
     },
     template="intern"
+)
+
+
+register_model_group(
+    models={
+        "InternLM2-7B": {
+            DownloadSource.DEFAULT: "internlm/internlm2-7b",
+            DownloadSource.MODELSCOPE: "Shanghai_AI_Laboratory/internlm2-7b"
+        },
+        "InternLM2-20B": {
+            DownloadSource.DEFAULT: "internlm/internlm2-20b",
+            DownloadSource.MODELSCOPE: "Shanghai_AI_Laboratory/internlm2-20b"
+        },
+        "InternLM2-7B-Chat": {
+            DownloadSource.DEFAULT: "internlm/internlm2-chat-7b",
+            DownloadSource.MODELSCOPE: "Shanghai_AI_Laboratory/internlm2-chat-7b"
+        },
+        "InternLM2-20B-Chat": {
+            DownloadSource.DEFAULT: "internlm/internlm2-chat-20b",
+            DownloadSource.MODELSCOPE: "Shanghai_AI_Laboratory/internlm2-chat-20b"
+        }
+    },
+    module="wqkv",
+    template="intern2"
 )
 
 
