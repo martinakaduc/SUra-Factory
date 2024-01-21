@@ -2,28 +2,29 @@ import json
 import datasets
 import pandas as pd
 from typing import List
+import random
 
-_DESCRIPTION = "ORCA DPO Pairs in Vietnamese"
+_DESCRIPTION = "Synthetic Reasoning (Natual) Dataset for DPO"
 _CITATION = ""
-_HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/orca_dpo_pairs"
+_HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/synthetic_reasoning_natural-dpo"
 _LICENSE = "mit"
-_URL = "https://huggingface.co/datasets/ura-hcmut/orca_dpo_pairs/resolve/main/"
+_URL = "https://huggingface.co/datasets/ura-hcmut/synthetic_reasoning_natural-dpo/resolve/main/"
 _URLS = {
-    "train": [
-        _URL + "orca_dpo_pairs_train_filtered.csv",
+    "test": [
+        _URL + "synthetic_reasoning_natural-dpo.json",
     ],
 }
 
 
-class OrcaDPOPairsVi(datasets.GeneratorBasedBuilder):
+class SyntheticReasoningNaturalDPO(datasets.GeneratorBasedBuilder):
 
     VERSION = datasets.Version("0.0.0")
 
     def _info(self) -> datasets.DatasetInfo:
         features = datasets.Features({
             "system": datasets.Value("string"),
-            "question": datasets.Value("string"),
-            "response": datasets.Sequence(datasets.Value("string")),
+            "instruction": datasets.Value("string"),
+            "output": datasets.Sequence(datasets.Value("string")),
         })
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
@@ -37,22 +38,22 @@ class OrcaDPOPairsVi(datasets.GeneratorBasedBuilder):
         file_path = dl_manager.download_and_extract(_URLS)
         return [
             datasets.SplitGenerator(
-                name=datasets.Split.TRAIN,
+                name=datasets.Split.TEST,
                 gen_kwargs={
-                    "filepaths": file_path["train"]
+                    "filepaths": file_path["test"]
                 }
             ),
         ]
 
     def _generate_examples(self, filepaths: List[str]):
         for filepath in filepaths:
-            df = pd.read_csv(filepath)
+            df = pd.read_json(filepath)
             for key, row in df.iterrows():
-                chosen = row["chosen"]
-                rejected = row["rejected"]
+                chosen = random.choice(row["chosen"])
+                rejected = random.choice(row["rejected"])
 
                 yield key, {
                     "system": row["system"],
-                    "question": row["question"],
+                    "instruction": row["instruction"],
                     "response": [chosen, rejected]
                 }

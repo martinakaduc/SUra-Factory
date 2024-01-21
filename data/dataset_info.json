@@ -401,7 +401,7 @@
     "hf_hub_url": "ura-hcmut/cococ_sft_rag"
   },
   "mlqa-dpo": {
-    "hf_hub_url": "ura-hcmut/mlqa-dpo",
+    "script_url": "ura-hcmut/mlqa-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -411,7 +411,7 @@
     "ranking": true
   },
   "xquad_xtreme-dpo": {
-    "hf_hub_url": "ura-hcmut/xquad_xtreme-dpo",
+    "script_url": "ura-hcmut/xquad_xtreme-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -421,7 +421,7 @@
     "ranking": true
   },
   "opus100-dpo": {
-    "hf_hub_url": "ura-hcmut/opus100-dpo",
+    "script_url": "ura-hcmut/opus100-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -430,7 +430,7 @@
     "ranking": true
   },
   "PhoMT-dpo": {
-    "hf_hub_url": "ura-hcmut/PhoMT-dpo",
+    "script_url": "ura-hcmut/PhoMT-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -439,7 +439,7 @@
     "ranking": true
   },
   "vietnews-dpo": {
-    "hf_hub_url": "ura-hcmut/vietnews-dpo",
+    "script_url": "ura-hcmut/vietnews-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -448,7 +448,7 @@
     "ranking": true
   },
   "wiki_lingua-dpo": {
-    "hf_hub_url": "ura-hcmut/wiki_lingua-dpo",
+    "script_url": "ura-hcmut/wiki_lingua-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -457,7 +457,7 @@
     "ranking": true
   },
   "synthetic_reasoning-dpo": {
-    "hf_hub_url": "ura-hcmut/synthetic_reasoning-dpo",
+    "script_url": "ura-hcmut/synthetic_reasoning-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -466,7 +466,7 @@
     "ranking": true
   },
   "synthetic_reasoning_natural-dpo": {
-    "hf_hub_url": "ura-hcmut/synthetic_reasoning_natural-dpo",
+    "script_url": "ura-hcmut/synthetic_reasoning_natural-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -475,7 +475,7 @@
     "ranking": true
   },
   "VSEC-dpo": {
-    "hf_hub_url": "ura-hcmut/VSEC-dpo",
+    "script_url": "ura-hcmut/VSEC-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -484,7 +484,7 @@
     "ranking": true
   },
   "mlqa_MLM-dpo": {
-    "hf_hub_url": "ura-hcmut/mlqa_MLM-dpo",
+    "script_url": "ura-hcmut/mlqa_MLM-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -493,7 +493,7 @@
     "ranking": true
   },
   "math-dpo": {
-    "hf_hub_url": "ura-hcmut/math-dpo",
+    "script_url": "ura-hcmut/math-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
@@ -502,7 +502,7 @@
     "ranking": true
   },
   "zalo_e2eqa-dpo": {
-    "hf_hub_url": "ura-hcmut/zalo_e2eqa-dpo",
+    "script_url": "ura-hcmut/zalo_e2eqa-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",

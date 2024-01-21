@@ -10,8 +10,8 @@ _HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/mlqa-dpo"
 _LICENSE = "mit"
 _URL = "https://huggingface.co/datasets/ura-hcmut/mlqa-dpo/resolve/main/"
 _URLS = {
-    "train": [
-        _URL + "mlqa-dpo.csv",
+    "test": [
+        _URL + "mlqa-dpo.json",
     ],
 }
 
@@ -39,19 +39,19 @@ class MLQADPO(datasets.GeneratorBasedBuilder):
         file_path = dl_manager.download_and_extract(_URLS)
         return [
             datasets.SplitGenerator(
-                name=datasets.Split.TRAIN,
+                name=datasets.Split.TEST,
                 gen_kwargs={
-                    "filepaths": file_path["train"]
+                    "filepaths": file_path["test"]
                 }
             ),
         ]
 
     def _generate_examples(self, filepaths: List[str]):
         for filepath in filepaths:
-            df = pd.read_csv(filepath)
+            df = pd.read_json(filepath)
             for key, row in df.iterrows():
-                chosen = random.choice(eval(row["chosen"]))
-                rejected = random.choice(eval(row["rejected"]))
+                chosen = random.choice(row["chosen"])
+                rejected = random.choice(row["rejected"])
 
                 yield key, {
                     "system": row["system"],
