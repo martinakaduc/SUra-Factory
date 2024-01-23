@@ -15,11 +15,11 @@ JSON_FORMAT_PROMPT = (
 
 TOOL_SYSTEM_PROMPT = (
     "You have access to the following tools:\n{tool_text}"
-    "Use the following format to answer the question:\n"
+    "Use the following format if using a tool:\n"
     "```\n"
-    "Action: the action to take, should be one of [{tool_names}] if using a tool.\n"
-    "Action Input: the input to the action{format_prompt}.\n"
-    "```"
+    "Action: tool name (one of [{tool_names}]).\n"
+    "Action Input: the input to the tool{format_prompt}.\n"
+    "```\n"
 )
 
 
@@ -31,12 +31,16 @@ def default_tool_formatter(tools: List[Dict[str, Any]]) -> str:
         for name, param in tool["parameters"]["properties"].items():
             required = ", required" if name in tool["parameters"].get("required", []) else ""
             enum = ", should be one of [{}]".format(", ".join(param["enum"])) if param.get("enum", None) else ""
-            param_text += "  - {name} ({type}{required}): {desc}{enum}\n".format(
+            items = (
+                ", where each item should be {}".format(param["items"].get("type", "")) if param.get("items") else ""
+            )
+            param_text += "  - {name} ({type}{required}): {desc}{enum}{items}\n".format(
                 name=name,
                 type=param.get("type", ""),
                 required=required,
                 desc=param.get("description", ""),
                 enum=enum,
+                items=items,
             )
 
         tool_text += "> Tool Name: {name}\nTool Description: {desc}\nTool Args:\n{args}\n".format(
@@ -91,12 +95,15 @@ class StringFormatter(Formatter):
         for slot in self.slots:
             if isinstance(slot, str):
                 for name, value in kwargs.items():
+                    if not isinstance(value, str):
+                        raise RuntimeError("Expected a string, got {}".format(value))
+
                     slot = slot.replace("{{" + name + "}}", value, 1)
                 elements.append(slot)
             elif isinstance(slot, (dict, set)):
                 elements.append(slot)
             else:
-                raise ValueError("Input must be string, set[str] or dict[str, str], got {}".format(type(slot)))
+                raise RuntimeError("Input must be string, set[str] or dict[str, str], got {}".format(type(slot)))
 
         return elements
 
@@ -120,7 +127,7 @@ class FunctionFormatter(Formatter):
             elif isinstance(slot, (dict, set)):
                 elements.append(slot)
             else:
-                raise ValueError("Input must be string, set[str] or dict[str, str], got {}".format(type(slot)))
+                raise RuntimeError("Input must be string, set[str] or dict[str, str], got {}".format(type(slot)))
 
         return elements
 

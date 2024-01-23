@@ -223,6 +223,7 @@ def _prepare_model_for_training(
             logger.warning("Current model does not support gradient checkpointing.")
         else:
             model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+            model.enable_input_require_grads()
             model.config.use_cache = False  # turn off when gradient checkpointing is enabled
             logger.info("Gradient checkpointing enabled.")
 
@@ -282,6 +283,12 @@ def patch_model(
 
     if is_trainable:
         _prepare_model_for_training(model, model_args)
+
+    if getattr(model.config, "model_type", None) == "mixtral" and is_deepspeed_zero3_enabled():
+        require_version("deepspeed>=0.13.0", "To fix: pip install deepspeed>=0.13.0")
+        from deepspeed.utils import set_z3_leaf_modules  # type: ignore
+        from transformers.models.mixtral.modeling_mixtral import MixtralSparseMoeBlock
+        set_z3_leaf_modules(model, [MixtralSparseMoeBlock])
 
 
 def patch_valuehead_model(model: "AutoModelForCausalLMWithValueHead") -> None:
