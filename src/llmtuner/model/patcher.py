@@ -16,6 +16,7 @@ from ..extras.logging import get_logger
 from ..extras.misc import get_current_device, infer_optim_dtype
 from ..extras.packages import is_flash_attn2_available
 from ..extras.patches.llama_patch import apply_llama_patch
+from ..extras.patches.mixtral_patch import patch_mixtral_replace_moe_impl
 
 
 if TYPE_CHECKING:
@@ -288,7 +289,11 @@ def patch_model(
         require_version("deepspeed>=0.13.0", "To fix: pip install deepspeed>=0.13.0")
         from deepspeed.utils import set_z3_leaf_modules  # type: ignore
         from transformers.models.mixtral.modeling_mixtral import MixtralSparseMoeBlock
+
         set_z3_leaf_modules(model, [MixtralSparseMoeBlock])
+
+        if is_trainable:
+            patch_mixtral_replace_moe_impl()
 
 
 def patch_valuehead_model(model: "AutoModelForCausalLMWithValueHead") -> None:
