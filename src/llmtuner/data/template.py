@@ -117,9 +117,9 @@ class Template:
             elif isinstance(elem, dict):
                 token_ids += [tokenizer.convert_tokens_to_ids(elem.get("token"))]
             elif isinstance(elem, set):
-                if "bos_token" in elem and tokenizer.bos_token_id:
+                if "bos_token" in elem and tokenizer.bos_token_id is not None:
                     token_ids += [tokenizer.bos_token_id]
-                elif "eos_token" in elem and tokenizer.eos_token_id:
+                elif "eos_token" in elem and tokenizer.eos_token_id is not None:
                     token_ids += [tokenizer.eos_token_id]
             else:
                 raise ValueError("Input must be string, set[str] or dict[str, str], got {}".format(type(elem)))
@@ -218,7 +218,7 @@ def register_template(
     default_user_formatter = StringFormatter(slots=["{{content}}"])
     default_assistant_formatter = StringFormatter(slots=["{{content}}"] + eos_slots)
     default_function_formatter = FunctionFormatter(slots=["Action: {{name}}\nAction Input: {{arguments}}"] + eos_slots)
-    default_tool_formatter = ToolFormatter(slots="default")
+    default_tool_formatter = ToolFormatter(tool_format="default")
     default_separator_formatter = EmptyFormatter()
     templates[name] = template_class(
         format_user=format_user or default_user_formatter,
@@ -357,6 +357,14 @@ register_template(
 
 
 register_template(
+    name="cpm",
+    format_user=StringFormatter(slots=["<用户>{{content}}<AI>"]),
+    format_system=StringFormatter(slots=[{"bos_token"}, "{{content}}"]),
+    force_system=True,
+)
+
+
+register_template(
     name="deepseek",
     format_user=StringFormatter(slots=["User: {{content}}\n\nAssistant:"]),
     format_system=StringFormatter(slots=[{"bos_token"}, "{{content}}"]),
@@ -464,7 +472,7 @@ register_template(
 
 register_template(
     name="orion",
-    format_user=StringFormatter(slots=["Human: {{content}}\n\nAssistant: </s>"]),
+    format_user=StringFormatter(slots=["Human: {{content}}\n\nAssistant: ", {"eos_token"}]),
     format_system=StringFormatter(slots=[{"bos_token"}, "{{content}}"]),
     force_system=True,
 )
