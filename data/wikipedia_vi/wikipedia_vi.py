@@ -50,5 +50,5 @@ class WikipediaVi(datasets.GeneratorBasedBuilder):
             df = pd.read_parquet(file)
             for key, row in df.iterrows():
                 yield key, {
-                    "text": row["text"].split("Liên kết ngoài")[0].split("Xem thêm")[0].split("Tham khảo")[0].split("Chú thích")[0].strip()
+                    "text": row["text"].replace("Nguồn:", "").split("Liên kết ngoài")[0].split("Xem thêm")[0].split("Tham khảo")[0].split("Chú thích")[0].strip()
                 }

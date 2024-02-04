@@ -10,7 +10,7 @@ _HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/synthetic_reasoning-dpo"
 _LICENSE = "mit"
 _URL = "https://huggingface.co/datasets/ura-hcmut/synthetic_reasoning-dpo/resolve/main/"
 _URLS = {
-    "test": [
+    "train": [
         _URL + "synthetic_induction-dpo.json",
         _URL + "synthetic_pattern-dpo.json",
         _URL + "synthetic_variable-dpo.json",
@@ -26,7 +26,9 @@ class SyntheticReasoningASDPO(datasets.GeneratorBasedBuilder):
         features = datasets.Features({
             "system": datasets.Value("string"),
             "instruction": datasets.Value("string"),
-            "output": datasets.Sequence(datasets.Value("string")),
+            "response": datasets.Sequence(datasets.Value("string")),
+            "chosen": datasets.Value("string"),
+            "rejected": datasets.Value("string"),
         })
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
@@ -40,9 +42,9 @@ class SyntheticReasoningASDPO(datasets.GeneratorBasedBuilder):
         file_path = dl_manager.download_and_extract(_URLS)
         return [
             datasets.SplitGenerator(
-                name=datasets.Split.TEST,
+                name=datasets.Split.TRAIN,
                 gen_kwargs={
-                    "filepaths": file_path["test"]
+                    "filepaths": file_path["train"]
                 }
             ),
         ]
@@ -52,10 +54,12 @@ class SyntheticReasoningASDPO(datasets.GeneratorBasedBuilder):
             df = pd.read_json(filepath)
             for key, row in df.iterrows():
                 chosen = random.choice(row["chosen"])
-                rejected = random.choice(row["rejected"])
+                rejected = random.choice(row["rejected"]) if len(row["rejected"]) > 0 else ""
 
                 yield key, {
                     "system": row["system"],
                     "instruction": row["instruction"],
-                    "response": [chosen, rejected]
+                    "response": [chosen, rejected],
+                    "chosen": chosen,
+                    "rejected": rejected
                 }

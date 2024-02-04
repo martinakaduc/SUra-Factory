@@ -345,6 +345,20 @@
       "prompt": "text"
     }
   },
+  "oscar_en": {
+    "hf_hub_url": "oscar-corpus/OSCAR-2301",
+    "subset": "en",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "culturax_en": {
+    "hf_hub_url": "uonlp/CulturaX",
+    "subset": "en",
+    "columns": {
+      "prompt": "text"
+    }
+  },
   "culturax_vi": {
     "hf_hub_url": "uonlp/CulturaX",
     "subset": "vi",
@@ -364,8 +378,37 @@
       "prompt": "text"
     }
   },
-  "general_data_vi": {
+  "general_data_vi_p1": {
     "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "subset": "train_1",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "general_data_vi_p2": {
+    "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "subset": "train_2",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "general_data_vi_p3": {
+    "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "subset": "train_3",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "general_data_vi_p4": {
+    "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "subset": "train_4",
+    "columns": {
+      "prompt": "text"
+    }
+  },
+  "general_data_vi_p5": {
+    "hf_hub_url": "tinhpx2911/vietnamese_general_data_processed",
+    "subset": "train_5",
     "columns": {
       "prompt": "text"
     }
@@ -377,19 +420,16 @@
     }
   },
   "vietai_book_vi": {
-    "hf_hub_url": "tinhpx2911/vietai_book_data",
+    "hf_hub_url": "tinhpx2911/book_data_processed",
     "columns": {
       "prompt": "text"
     }
   },
-  "orca_dpo_pairs_vi": {
-    "script_url": "orca_dpo_pairs_vi",
+  "vi_dataset": {
+    "hf_hub_url": "tinhpx2911/vi_dataset_processed",
     "columns": {
-      "system": "system",
-      "prompt": "question",
-      "response": "response"
-    },
-    "ranking": true
+      "prompt": "text"
+    }
   },
   "rlaif-nectar": {
     "hf_hub_url": "AstraMindAI/RLAIF-Nectar",
@@ -401,13 +441,22 @@
   "coccoc_sft_rag": {
     "hf_hub_url": "ura-hcmut/cococ_sft_rag"
   },
+  "orca_dpo_pairs_vi": {
+    "script_url": "orca_dpo_pairs_vi",
+    "columns": {
+      "system": "system",
+      "prompt": "question",
+      "response": "chosen"
+    },
+    "ranking": true
+  },
   "mlqa-dpo": {
     "script_url": "ura-hcmut/mlqa-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
       "query": "input",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -417,16 +466,16 @@
       "system": "system",
       "prompt": "instruction",
       "query": "input",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
-  "opus100-dpo": {
-    "script_url": "ura-hcmut/opus100-dpo",
+  "OPUS100-dpo": {
+    "script_url": "ura-hcmut/OPUS100-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -435,7 +484,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -444,7 +493,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -453,7 +502,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -462,7 +511,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -471,7 +520,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -480,7 +529,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -489,16 +538,16 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
-  "math-dpo": {
-    "script_url": "ura-hcmut/math-dpo",
+  "MATH-dpo": {
+    "script_url": "ura-hcmut/MATH-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   },
@@ -507,7 +556,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "output"
+      "response": "chosen"
     },
     "ranking": true
   }

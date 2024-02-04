@@ -4,19 +4,20 @@ import pandas as pd
 from typing import List
 import random
 
-_DESCRIPTION = "MATH Dataset for DPO"
+_DESCRIPTION = "OPUS100 Dataset for DPO"
 _CITATION = ""
-_HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/MATH-dpo"
+_HOMEPAGE = "https://huggingface.co/datasets/ura-hcmut/OPUS100-dpo"
 _LICENSE = "mit"
-_URL = "https://huggingface.co/datasets/ura-hcmut/MATH-dpo/resolve/main/"
+_URL = "https://huggingface.co/datasets/ura-hcmut/OPUS100-dpo/resolve/main/"
 _URLS = {
-    "test": [
-        _URL + "math-dpo.json",
+    "train": [
+        _URL + "opus100_vien-dpo.json",
+        _URL + "opus100_envi-dpo.json",
     ],
 }
 
 
-class MATHDPO(datasets.GeneratorBasedBuilder):
+class OPUS100DPO(datasets.GeneratorBasedBuilder):
 
     VERSION = datasets.Version("0.0.0")
 
@@ -24,7 +25,9 @@ class MATHDPO(datasets.GeneratorBasedBuilder):
         features = datasets.Features({
             "system": datasets.Value("string"),
             "instruction": datasets.Value("string"),
-            "output": datasets.Sequence(datasets.Value("string")),
+            "response": datasets.Sequence(datasets.Value("string")),
+            "chosen": datasets.Value("string"),
+            "rejected": datasets.Value("string"),
         })
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
@@ -38,9 +41,9 @@ class MATHDPO(datasets.GeneratorBasedBuilder):
         file_path = dl_manager.download_and_extract(_URLS)
         return [
             datasets.SplitGenerator(
-                name=datasets.Split.TEST,
+                name=datasets.Split.TRAIN,
                 gen_kwargs={
-                    "filepaths": file_path["test"]
+                    "filepaths": file_path["train"]
                 }
             ),
         ]
@@ -50,10 +53,12 @@ class MATHDPO(datasets.GeneratorBasedBuilder):
             df = pd.read_json(filepath)
             for key, row in df.iterrows():
                 chosen = random.choice(row["chosen"])
-                rejected = random.choice(row["rejected"])
+                rejected = random.choice(row["rejected"]) if len(row["rejected"]) > 0 else ""
 
                 yield key, {
                     "system": row["system"],
                     "instruction": row["instruction"],
-                    "response": [chosen, rejected]
+                    "response": [chosen, rejected],
+                    "chosen": chosen,
+                    "rejected": rejected
                 }

@@ -516,6 +516,13 @@ register_template(
 
 
 register_template(
+    name="vinai",
+    format_user=StringFormatter(slots=["### Câu hỏi: {{content}}\n### Trả lời:"]),
+    stop_words=["</s>"]
+)
+
+
+register_template(
     name="xuanyuan",
     format_user=StringFormatter(slots=["Human: {{content}} Assistant:"]),
     default_system=(

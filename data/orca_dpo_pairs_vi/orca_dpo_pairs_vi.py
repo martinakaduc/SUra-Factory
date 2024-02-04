@@ -24,6 +24,8 @@ class OrcaDPOPairsVi(datasets.GeneratorBasedBuilder):
             "system": datasets.Value("string"),
             "question": datasets.Value("string"),
             "response": datasets.Sequence(datasets.Value("string")),
+            "chosen": datasets.Value("string"),
+            "rejected": datasets.Value("string"),
         })
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
@@ -48,11 +50,14 @@ class OrcaDPOPairsVi(datasets.GeneratorBasedBuilder):
         for filepath in filepaths:
             df = pd.read_csv(filepath)
             for key, row in df.iterrows():
-                chosen = row["chosen"]
-                rejected = row["rejected"]
-
+                chosen = str(row["chosen"])
+                rejected = str(row["rejected"])
+                
                 yield key, {
                     "system": row["system"],
                     "question": row["question"],
-                    "response": [chosen, rejected]
+                    "response": [chosen, rejected],
+                    "chosen": chosen,
+                    "rejected": rejected
+                    
                 }
