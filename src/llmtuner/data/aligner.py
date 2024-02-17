@@ -1,6 +1,8 @@
 from functools import partial
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
+from datasets import Features
+
 from .utils import Role
 
 
@@ -20,10 +22,14 @@ def convert_alpaca(examples: Dict[str, List[Any]], dataset_attr: "DatasetAttr") 
                 prompt.append({"role": Role.USER, "content": old_prompt})
                 prompt.append({"role": Role.ASSISTANT, "content": old_response})
 
-        instruction = examples[dataset_attr.prompt][i]
+        content = []
+        if dataset_attr.prompt and examples[dataset_attr.prompt][i]:
+            content.append(examples[dataset_attr.prompt][i])
+
         if dataset_attr.query and examples[dataset_attr.query][i]:
-            instruction += "\n" + examples[dataset_attr.query][i]
-        prompt.append({"role": Role.USER, "content": instruction})
+            content.append(examples[dataset_attr.query][i])
+
+        prompt.append({"role": Role.USER, "content": "\n".join(content)})
 
         if dataset_attr.response and isinstance(examples[dataset_attr.response][i], list):
             response = [{"role": Role.ASSISTANT, "content": content} for content in examples[dataset_attr.response][i]]
@@ -47,32 +53,34 @@ def convert_sharegpt(examples: Dict[str, List[Any]], dataset_attr: "DatasetAttr"
         dataset_attr.assistant_tag: Role.ASSISTANT,
         dataset_attr.observation_tag: Role.OBSERVATION,
         dataset_attr.function_tag: Role.FUNCTION,
+        dataset_attr.system_tag: Role.SYSTEM,
     }
+    odd_tags = (dataset_attr.user_tag, dataset_attr.observation_tag)
+    even_tags = (dataset_attr.assistant_tag, dataset_attr.function_tag)
+    accept_tags = (odd_tags, even_tags)
     for i, messages in enumerate(examples[dataset_attr.messages]):
+        if dataset_attr.system_tag and messages[0][dataset_attr.role_tag] == dataset_attr.system_tag:
+            system = messages[0][dataset_attr.content_tag]
+            messages = messages[1:]
+        else:
+            system = examples[dataset_attr.system][i] if dataset_attr.system else ""
+
         messages = messages[: len(messages) // 2 * 2]  # should be multiples of 2
         if len(messages) == 0:
             continue
 
-        prompt = []
-        response = []
+        aligned_messages = []
         for turn_idx, message in enumerate(messages):
-            if turn_idx % 2 == 0:
-                accept_tags = [dataset_attr.user_tag, dataset_attr.observation_tag]
-            else:
-                accept_tags = [dataset_attr.assistant_tag, dataset_attr.function_tag]
-
-            if message[dataset_attr.role_tag] not in accept_tags:
+            if message[dataset_attr.role_tag] not in accept_tags[turn_idx % 2]:
                 raise ValueError("Invalid role tag in {}.".format(messages))
 
-            prompt.append(
+            aligned_messages.append(
                 {"role": tag_mapping[message[dataset_attr.role_tag]], "content": message[dataset_attr.content_tag]}
             )
 
-        last_message = prompt.pop(-1)
-        response.append(last_message)
-        outputs["prompt"].append(prompt)
-        outputs["response"].append(response)
-        outputs["system"].append(examples[dataset_attr.system][i] if dataset_attr.system else "")
+        outputs["prompt"].append(aligned_messages[:-1])
+        outputs["response"].append(aligned_messages[-1:])
+        outputs["system"].append(system)
         outputs["tools"].append(examples[dataset_attr.tools][i] if dataset_attr.tools else "")
 
     return outputs
@@ -83,8 +91,8 @@ def align_dataset(
 ) -> Union["Dataset", "IterableDataset"]:
     r"""
     Aligned dataset:
-        prompt: [{"role": "user", "content": "..."}]
-        response: [{"role": "assistant", "content": "..."}]
+        prompt: [{"role": "user", "content": "..."}] * (2T - 1)
+        response: [{"role": "assistant", "content": "..."}] * N (N > 1 for ranking dataset)
         system: "..."
         tools: "..."
     """
@@ -94,6 +102,18 @@ def align_dataset(
         convert_func = partial(convert_sharegpt, dataset_attr=dataset_attr)
 
     column_names = list(next(iter(dataset)).keys())
+    features = Features.from_dict(
+        {
+            "prompt": [
+                {"role": {"dtype": "string", "_type": "Value"}, "content": {"dtype": "string", "_type": "Value"}}
+            ],
+            "response": [
+                {"role": {"dtype": "string", "_type": "Value"}, "content": {"dtype": "string", "_type": "Value"}}
+            ],
+            "system": {"dtype": "string", "_type": "Value"},
+            "tools": {"dtype": "string", "_type": "Value"},
+        }
+    )
     kwargs = {}
     if not data_args.streaming:
         kwargs = dict(
@@ -102,4 +122,10 @@ def align_dataset(
             desc="Converting format of dataset",
         )
 
-    return dataset.map(convert_func, batched=True, remove_columns=column_names, **kwargs)
+    return dataset.map(
+        convert_func,
+        batched=True,
+        remove_columns=column_names,
+        features=features,
+        **kwargs,
+    )

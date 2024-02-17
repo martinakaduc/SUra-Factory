@@ -19,8 +19,9 @@ logger = get_logger(__name__)
 class Role(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
-    OBSERVATION = "observation"
+    SYSTEM = "system"
     FUNCTION = "function"
+    OBSERVATION = "observation"
 
 
 def checksum(data_files: List[str], file_sha1: Optional[str] = None) -> None:

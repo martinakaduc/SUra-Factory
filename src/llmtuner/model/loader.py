@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Optional, Tuple
 
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 from transformers.integrations import is_deepspeed_zero3_enabled
-from transformers.utils.versions import require_version
 from trl import AutoModelForCausalLMWithValueHead
 
 from ..extras.logging import get_logger
@@ -19,13 +18,6 @@ if TYPE_CHECKING:
 
 
 logger = get_logger(__name__)
-
-
-require_version("transformers>=4.37.2", "To fix: pip install transformers>=4.37.2")
-require_version("datasets>=2.14.3", "To fix: pip install datasets>=2.14.3")
-require_version("accelerate>=0.21.0", "To fix: pip install accelerate>=0.21.0")
-require_version("peft>=0.7.0", "To fix: pip install peft>=0.7.0")
-require_version("trl>=0.7.6", "To fix: pip install trl>=0.7.6")
 
 
 def load_model_and_tokenizer(
@@ -63,8 +55,7 @@ def load_model_and_tokenizer(
 
     model = None
     if is_trainable and model_args.use_unsloth:
-        require_version("unsloth", "Follow the instructions at: https://github.com/unslothai/unsloth")
-        from unsloth import FastLlamaModel, FastMistralModel  # type: ignore
+        from unsloth import FastLanguageModel  # type: ignore
 
         unsloth_kwargs = {
             "model_name": model_args.model_name_or_path,
@@ -75,11 +66,9 @@ def load_model_and_tokenizer(
             "device_map": None,
             "rope_scaling": getattr(config, "rope_scaling", None),
         }
-        if getattr(config, "model_type", None) == "llama":
-            model, _ = FastLlamaModel.from_pretrained(**unsloth_kwargs)
-        elif getattr(config, "model_type", None) == "mistral":
-            model, _ = FastMistralModel.from_pretrained(**unsloth_kwargs)
-        else:
+        try:
+            model, _ = FastLanguageModel.from_pretrained(**unsloth_kwargs)
+        except NotImplementedError:
             logger.warning("Unsloth does not support model type {}.".format(getattr(config, "model_type", None)))
             model_args.use_unsloth = False
 
@@ -131,5 +120,13 @@ def load_model_and_tokenizer(
 
     if not is_trainable:
         logger.info("This IS expected that the trainable params is 0 if you are using model for inference only.")
+
+    if model_args.print_param_status:
+        for name, param in model.named_parameters():
+            print(
+                "name: {}, dtype: {}, device: {}, trainable: {}".format(
+                    name, param.dtype, param.device, param.requires_grad
+                )
+            )
 
     return model, tokenizer

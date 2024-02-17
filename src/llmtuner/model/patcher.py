@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import torch
 from datasets import load_dataset
+from peft import PeftModel
 from transformers import BitsAndBytesConfig, GPTQConfig, PreTrainedModel, PreTrainedTokenizerBase
 from transformers.integrations import is_deepspeed_zero3_enabled
 from transformers.utils.versions import require_version
@@ -226,7 +227,9 @@ def _prepare_model_for_training(
         if not getattr(model, "supports_gradient_checkpointing", False):
             logger.warning("Current model does not support gradient checkpointing.")
         else:
-            model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+            # use_reentrant=False might increase VRAM usage (have not been empirically verified yet)
+            # According to: https://github.com/huggingface/transformers/issues/28339
+            model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": True})
             model.enable_input_require_grads()
             model.config.use_cache = False  # turn off when gradient checkpointing is enabled
             logger.info("Gradient checkpointing enabled.")
@@ -297,6 +300,11 @@ def patch_model(
         if is_trainable:
             patch_mixtral_replace_moe_impl()
 
+    try:
+        model.add_model_tags(["llama-factory"])
+    except Exception:
+        logger.warning("Cannot properly tag the model.")
+
 
 def patch_valuehead_model(model: "AutoModelForCausalLMWithValueHead") -> None:
     def tie_weights(self: "AutoModelForCausalLMWithValueHead") -> None:
@@ -307,7 +315,12 @@ def patch_valuehead_model(model: "AutoModelForCausalLMWithValueHead") -> None:
         if isinstance(self.pretrained_model, PreTrainedModel):
             return self.pretrained_model.get_input_embeddings()
 
+    def create_or_update_model_card(self: "AutoModelForCausalLMWithValueHead", output_dir: str) -> None:
+        if isinstance(self.pretrained_model, PeftModel):
+            self.pretrained_model.create_or_update_model_card(output_dir)
+
     ignore_modules = [name for name, _ in model.named_parameters() if "pretrained_model" in name]
     setattr(model, "_keys_to_ignore_on_save", ignore_modules)
     setattr(model, "tie_weights", MethodType(tie_weights, model))
     setattr(model, "get_input_embeddings", MethodType(get_input_embeddings, model))
+    setattr(model, "create_or_update_model_card", MethodType(create_or_update_model_card, model))
