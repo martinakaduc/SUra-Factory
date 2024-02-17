@@ -30,7 +30,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 
 def load_wikitext():
     data = load_dataset('wikimedia/wikipedia', '20231101.vi', split="train")
-    return [text for text in data["text"] if text.strip() != '']
+    return [text.replace("Nguồn:", "").split("Liên kết ngoài")[0].split("Xem thêm")[0].split("Tham khảo")[0].split("Chú thích")[0].strip() for text in data["text"] if text.strip() != '']
 
 # Quantize
 model.quantize(

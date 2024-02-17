@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(
                     prog='Training new tokenizer')
 parser.add_argument('--model_name_or_path', type=str, required=True)
 parser.add_argument('--tokenizer_path', type=str, required=True)
-parser.add_argument('--dataset', type=str, default='wikimedia/wikipedia')
+parser.add_argument('--dataset', type=str, default='wikipedia_vi')
 parser.add_argument('--batch_size', type=int, default=4096)
 parser.add_argument('--max_vocab_size', type=int, default=64000)
 args = parser.parse_args()
@@ -22,7 +22,7 @@ def get_training_corpus(dataset_name, batch_size=1024):
         dataset = load_dataset(dataset_name, split="train")
         
     for i in range(0, len(dataset), batch_size):
-        yield [x.split("Liên kết ngoài")[0].split("Xem thêm")[0].split("Tham khảo")[0].split("Chú thích")[0].strip()
+        yield [x.replace("Nguồn:", "").split("Liên kết ngoài")[0].split("Xem thêm")[0].split("Tham khảo")[0].split("Chú thích")[0].strip()
             for x in dataset[i : i + batch_size]["text"]]
 
 def main(args):
