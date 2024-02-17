@@ -11,13 +11,12 @@ _LICENSE = "mit"
 _URL = "https://huggingface.co/datasets/ura-hcmut/OPUS100-dpo/resolve/main/"
 _URLS = {
     "train": [
-        _URL + "opus100_vien-dpo.json",
         _URL + "opus100_envi-dpo.json",
     ],
 }
 
 
-class OPUS100DPO(datasets.GeneratorBasedBuilder):
+class OPUS100EnViDPO(datasets.GeneratorBasedBuilder):
 
     VERSION = datasets.Version("0.0.0")
 

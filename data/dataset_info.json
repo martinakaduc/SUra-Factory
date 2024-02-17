@@ -431,6 +431,12 @@
       "prompt": "text"
     }
   },
+   "truyencotich_vi": {
+    "hf_hub_url": "vietgpt/truyencotich_vi",
+    "columns": {
+      "prompt": "content"
+    }
+  },
   "rlaif-nectar": {
     "hf_hub_url": "AstraMindAI/RLAIF-Nectar",
     "ranking": true
@@ -441,12 +447,19 @@
   "coccoc_sft_rag": {
     "hf_hub_url": "ura-hcmut/cococ_sft_rag"
   },
+  "10vancauhoi-sft": {
+    "hf_hub_url": "ura-hcmut/10vancauhoi",
+    "columns": {
+      "prompt": "prompt",
+      "response": "response"
+    }
+  },
   "orca_dpo_pairs_vi": {
     "script_url": "orca_dpo_pairs_vi",
     "columns": {
       "system": "system",
       "prompt": "question",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -456,7 +469,7 @@
       "system": "system",
       "prompt": "instruction",
       "query": "input",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -466,25 +479,43 @@
       "system": "system",
       "prompt": "instruction",
       "query": "input",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
-  "OPUS100-dpo": {
-    "script_url": "ura-hcmut/OPUS100-dpo",
+  "OPUS100-vien-dpo": {
+    "script_url": "ura-hcmut/OPUS100-vien-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
-  "PhoMT-dpo": {
-    "script_url": "ura-hcmut/PhoMT-dpo",
+  "OPUS100-envi-dpo": {
+    "script_url": "ura-hcmut/OPUS100-envi-dpo",
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
+    },
+    "ranking": true
+  },
+  "PhoMT-vien-dpo": {
+    "script_url": "ura-hcmut/PhoMT-vien-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "response"
+    },
+    "ranking": true
+  },
+  "PhoMT-envi-dpo": {
+    "script_url": "ura-hcmut/PhoMT-envi-dpo",
+    "columns": {
+      "system": "system",
+      "prompt": "instruction",
+      "response": "response"
     },
     "ranking": true
   },
@@ -493,7 +524,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -502,7 +533,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -511,7 +542,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -520,7 +551,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -529,7 +560,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -538,7 +569,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -547,7 +578,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   },
@@ -556,7 +587,7 @@
     "columns": {
       "system": "system",
       "prompt": "instruction",
-      "response": "chosen"
+      "response": "response"
     },
     "ranking": true
   }

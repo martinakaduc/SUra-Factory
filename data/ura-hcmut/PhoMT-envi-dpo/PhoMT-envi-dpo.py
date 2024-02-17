@@ -11,13 +11,12 @@ _LICENSE = "mit"
 _URL = "https://huggingface.co/datasets/ura-hcmut/PhoMT-dpo/resolve/main/"
 _URLS = {
     "train": [
-        _URL + "PhoMT_vien-dpo.json",
         _URL + "PhoMT_envi-dpo.json",
     ],
 }
 
 
-class PhoMTDPO(datasets.GeneratorBasedBuilder):
+class PhoMTEnViDPO(datasets.GeneratorBasedBuilder):
 
     VERSION = datasets.Version("0.0.0")
 
