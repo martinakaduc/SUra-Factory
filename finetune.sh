@@ -133,7 +133,6 @@ python src/export_model.py \
     --adapter_name_or_path saves/MixSUra \
     --use_fast_tokenizer True \
     --template mistral \
-    --flash_attn True \
     --export_size 5 \
     --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra \
@@ -145,7 +144,6 @@ python src/export_model.py \
     --adapter_name_or_path saves/MixSUra-SFT \
     --use_fast_tokenizer True \
     --template mistral \
-    --flash_attn True \
     --export_size 5 \
     --export_legacy_format False \
     --export_dir models/ura-hcmut/MixSUra-SFT \
