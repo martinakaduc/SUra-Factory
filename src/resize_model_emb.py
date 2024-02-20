@@ -49,6 +49,7 @@ def main(args):
 
     model.config.use_cache = True
     model = model.to("cpu")
+    print("Saving model...")
     model.save_pretrained(
         save_directory=args.export_dir,
         max_shard_size="{}GB".format(args.export_size),
@@ -56,6 +57,7 @@ def main(args):
     )
 
     try:
+        print("Saving tokenizer...")
         tokenizer.padding_side = "left" # restore padding side
         tokenizer.init_kwargs["padding_side"] = "left"
         tokenizer.save_pretrained(args.export_dir)
