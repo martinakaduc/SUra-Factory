@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 import torch
+import torch.nn.functional as F  
 from peft import LoraConfig, LoraModel, PeftModel, TaskType, get_peft_model
 from transformers.integrations import is_deepspeed_zero3_enabled
 
@@ -86,7 +87,32 @@ def init_adapter(
                 param.requires_grad_(False)
                 
     if finetuning_args.finetuning_type == "freeze-a2e" and is_trainable:
-        logger.info("Fine-tuning method: Freeze all except embeddings")
+        logger.info("Fine-tuning method: Freeze all except embedding and lm_head")
+        
+        # Freeze old embed_tokens
+        def emb_forward(input: torch.Tensor, self=model.model.embed_tokens) -> torch.Tensor:
+            mask = torch.zeros((model.model.embed_tokens.weight.shape[0],1), device=input.device, dtype=input.dtype)
+            mask[:32000] = 1.0
+            old_tokens = F.embedding(
+                input, self.weight * mask, self.padding_idx, self.max_norm,
+                self.norm_type, self.scale_grad_by_freq, self.sparse).detach()
+            new_tokens = F.embedding(
+                input, self.weight * (1-mask), self.padding_idx, self.max_norm,
+                self.norm_type, self.scale_grad_by_freq, self.sparse)
+            return old_tokens + new_tokens
+        model.model.embed_tokens.forward = emb_forward
+
+        # Freeze old lm_head
+        def lin_forward(input: torch.Tensor, self=model.lm_head) -> torch.Tensor:
+            mask = torch.zeros((model.model.embed_tokens.weight.shape[0],1), device=input.device, dtype=input.dtype)
+            mask[:32000] = 1.0
+            old_tokens = F.linear(input, self.weight*mask, self.bias).detach()
+            new_tokens = F.linear(input, self.weight*(1-mask), self.bias)
+            return old_tokens + new_tokens
+        model.lm_head.forward = lin_forward
+
+        finetuning_args.name_module_trainable += ["embed_tokens", "lm_head"]
+        
         for name, param in model.named_parameters():
             if not any(trainable_module in name for trainable_module in finetuning_args.name_module_trainable):
                 param.requires_grad_(False)
