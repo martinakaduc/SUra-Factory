@@ -27,6 +27,11 @@ class FreezeArguments:
         metadata={"help": "The number of trainable layers for partial-parameter (freeze) fine-tuning."},
     )
 
+    old_vocab_size: Optional[int] = field(
+        default=32000,
+        metadata={"help": "The number of tokens to be freezed."},
+    )
+
 
 @dataclass
 class LoraArguments:
