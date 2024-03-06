@@ -6,7 +6,7 @@ from peft import LoraConfig, LoraModel, PeftModel, TaskType, get_peft_model
 from transformers.integrations import is_deepspeed_zero3_enabled
 
 from ..extras.logging import get_logger
-from .utils import find_all_linear_modules
+from .utils import find_all_linear_modules, find_expanded_modules
 
 
 if TYPE_CHECKING:
@@ -86,13 +86,15 @@ def init_adapter(
             else:
                 param.requires_grad_(False)
                 
+        logger.info("Set trainable layers: {}".format(",".join(map(str, trainable_layer_ids))))
+        
     if finetuning_args.finetuning_type == "freeze-a2e" and is_trainable:
         logger.info("Fine-tuning method: Freeze all except embedding and lm_head")
         
         # Freeze old embed_tokens
         def emb_forward(input: torch.Tensor, self=model.model.embed_tokens) -> torch.Tensor:
             mask = torch.zeros((model.model.embed_tokens.weight.shape[0],1), device=input.device, dtype=input.dtype)
-            mask[:32000] = 1.0
+            mask[:finetuning_args.old_vocab_size] = 1.0
             old_tokens = F.embedding(
                 input, self.weight * mask, self.padding_idx, self.max_norm,
                 self.norm_type, self.scale_grad_by_freq, self.sparse).detach()
@@ -105,7 +107,7 @@ def init_adapter(
         # Freeze old lm_head
         def lin_forward(input: torch.Tensor, self=model.lm_head) -> torch.Tensor:
             mask = torch.zeros((model.model.embed_tokens.weight.shape[0],1), device=input.device, dtype=input.dtype)
-            mask[:32000] = 1.0
+            mask[:finetuning_args.old_vocab_size] = 1.0
             old_tokens = F.linear(input, self.weight*mask, self.bias).detach()
             new_tokens = F.linear(input, self.weight*(1-mask), self.bias)
             return old_tokens + new_tokens
@@ -118,9 +120,9 @@ def init_adapter(
                 param.requires_grad_(False)
             else:
                 param.requires_grad_(True).to(torch.float32)
-        
+                
     if finetuning_args.finetuning_type == "lora":
-        logger.info("Fine-tuning method: LoRA")
+        logger.info("Fine-tuning method: {}".format("DoRA" if finetuning_args.use_dora else "LoRA"))
         adapter_to_resume = None
 
         if model_args.adapter_name_or_path is not None:
@@ -155,6 +157,13 @@ def init_adapter(
             else:
                 target_modules = finetuning_args.lora_target
 
+            if finetuning_args.use_llama_pro:
+                target_modules = find_expanded_modules(model, target_modules, finetuning_args.num_layer_trainable)
+
+            if finetuning_args.use_dora:
+                if getattr(model, "quantization_method", None):
+                    raise ValueError("DoRA is currently not compatible with quantized models.")
+
             peft_kwargs = {
                 "r": finetuning_args.lora_rank,
                 "target_modules": target_modules,
@@ -173,6 +182,7 @@ def init_adapter(
                     task_type=TaskType.CAUSAL_LM,
                     inference_mode=False,
                     modules_to_save=finetuning_args.additional_target,
+                    use_dora=finetuning_args.use_dora,
                     **peft_kwargs,
                 )
                 model = get_peft_model(model, lora_config)

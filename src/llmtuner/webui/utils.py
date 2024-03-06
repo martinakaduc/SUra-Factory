@@ -44,11 +44,14 @@ def can_quantize(finetuning_type: str) -> Dict[str, Any]:
 def check_json_schema(text: str, lang: str) -> None:
     try:
         tools = json.loads(text)
-        for tool in tools:
-            assert "name" in tool
-    except AssertionError:
+        if tools:
+            assert isinstance(tools, list)
+            for tool in tools:
+                if "name" not in tool:
+                    raise ValueError("Name not found.")
+    except ValueError:
         gr.Warning(ALERTS["err_tool_name"][lang])
-    except json.JSONDecodeError:
+    except Exception:
         gr.Warning(ALERTS["err_json_schema"][lang])
 
 
@@ -79,6 +82,7 @@ def gen_plot(base_model: str, finetuning_type: str, output_dir: str) -> "matplot
         return
 
     plt.close("all")
+    plt.switch_backend("agg")
     fig = plt.figure()
     ax = fig.add_subplot(111)
     steps, losses = [], []
@@ -92,8 +96,8 @@ def gen_plot(base_model: str, finetuning_type: str, output_dir: str) -> "matplot
     if len(losses) == 0:
         return None
 
-    ax.plot(steps, losses, alpha=0.4, label="original")
-    ax.plot(steps, smooth(losses), label="smoothed")
+    ax.plot(steps, losses, color="#1f77b4", alpha=0.4, label="original")
+    ax.plot(steps, smooth(losses), color="#1f77b4", label="smoothed")
     ax.legend()
     ax.set_xlabel("step")
     ax.set_ylabel("loss")

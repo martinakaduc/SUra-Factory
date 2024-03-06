@@ -326,6 +326,29 @@ register_model_group(
 
 register_model_group(
     models={
+        "Gemma-2B": {
+            DownloadSource.DEFAULT: "google/gemma-2b",
+            DownloadSource.MODELSCOPE: "AI-ModelScope/gemma-2b",
+        },
+        "Gemma-7B": {
+            DownloadSource.DEFAULT: "google/gemma-7b",
+            DownloadSource.MODELSCOPE: "AI-ModelScope/gemma-2b-it",
+        },
+        "Gemma-2B-Chat": {
+            DownloadSource.DEFAULT: "google/gemma-2b-it",
+            DownloadSource.MODELSCOPE: "AI-ModelScope/gemma-7b",
+        },
+        "Gemma-7B-Chat": {
+            DownloadSource.DEFAULT: "google/gemma-7b-it",
+            DownloadSource.MODELSCOPE: "AI-ModelScope/gemma-7b-it",
+        },
+    },
+    template="gemma",
+)
+
+
+register_model_group(
+    models={
         "InternLM-7B": {
             DownloadSource.DEFAULT: "internlm/internlm-7b",
             DownloadSource.MODELSCOPE: "Shanghai_AI_Laboratory/internlm-7b",
@@ -543,7 +566,10 @@ register_model_group(
             DownloadSource.DEFAULT: "Qwen/Qwen-1_8B-Chat",
             DownloadSource.MODELSCOPE: "qwen/Qwen-1_8B-Chat",
         },
-        "Qwen-7B-Chat": {DownloadSource.DEFAULT: "Qwen/Qwen-7B-Chat", DownloadSource.MODELSCOPE: "qwen/Qwen-7B-Chat"},
+        "Qwen-7B-Chat": {
+            DownloadSource.DEFAULT: "Qwen/Qwen-7B-Chat",
+            DownloadSource.MODELSCOPE: "qwen/Qwen-7B-Chat",
+        },
         "Qwen-14B-Chat": {
             DownloadSource.DEFAULT: "Qwen/Qwen-14B-Chat",
             DownloadSource.MODELSCOPE: "qwen/Qwen-14B-Chat",
@@ -719,6 +745,21 @@ register_model_group(
 
 register_model_group(
     models={
+        "StarCoder2-3B": {
+            DownloadSource.DEFAULT: "bigcode/starcoder2-3b",
+        },
+        "StarCoder2-7B": {
+            DownloadSource.DEFAULT: "bigcode/starcoder2-7b",
+        },
+        "StarCoder2-15B": {
+            DownloadSource.DEFAULT: "bigcode/starcoder2-15b",
+        },
+    }
+)
+
+
+register_model_group(
+    models={
         "Vicuna1.5-7B-Chat": {
             DownloadSource.DEFAULT: "lmsys/vicuna-7b-v1.5",
             DownloadSource.MODELSCOPE: "Xorbits/vicuna-7b-v1.5",
@@ -823,9 +864,17 @@ register_model_group(
             DownloadSource.DEFAULT: "01-ai/Yi-6B-Chat-8bits",
             DownloadSource.MODELSCOPE: "01ai/Yi-6B-Chat-8bits",
         },
+        "Yi-6B-int4-Chat": {
+            DownloadSource.DEFAULT: "01-ai/Yi-6B-Chat-4bits",
+            DownloadSource.MODELSCOPE: "01ai/Yi-6B-Chat-4bits",
+        },
         "Yi-34B-int8-Chat": {
             DownloadSource.DEFAULT: "01-ai/Yi-34B-Chat-8bits",
             DownloadSource.MODELSCOPE: "01ai/Yi-34B-Chat-8bits",
+        },
+        "Yi-34B-int4-Chat": {
+            DownloadSource.DEFAULT: "01-ai/Yi-34B-Chat-4bits",
+            DownloadSource.MODELSCOPE: "01ai/Yi-34B-Chat-4bits",
         },
     },
     template="yi",
@@ -863,4 +912,19 @@ register_model_group(
         },
     },
     template="zephyr",
+)
+
+
+register_model_group(
+    models={
+        "Atom-7B": {
+            DownloadSource.DEFAULT: "FlagAlpha/Atom-7B",
+            DownloadSource.MODELSCOPE: "FlagAlpha/Atom-7B",
+        },
+        "Atom-7B-Chat": {
+            DownloadSource.DEFAULT: "FlagAlpha/Atom-7B-Chat",
+            DownloadSource.MODELSCOPE: "FlagAlpha/Atom-7B-Chat",
+        },
+    },
+    template="atom",
 )

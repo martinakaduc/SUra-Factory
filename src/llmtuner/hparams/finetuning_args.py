@@ -26,10 +26,6 @@ class FreezeArguments:
         default=3,
         metadata={"help": "The number of trainable layers for partial-parameter (freeze) fine-tuning."},
     )
-    use_llama_pro: Optional[bool] = field(
-        default=False,
-        metadata={"help": "Whether or not to use llama pro for partial-parameter (freeze) fine-tuning."},
-    )
 
 
 @dataclass
@@ -78,6 +74,9 @@ class LoraArguments:
         default=False,
         metadata={"help": "Whether or not to use the rank stabilization scaling factor for LoRA layer."},
     )
+    use_dora: Optional[bool] = field(
+        default=False, metadata={"help": "Whether or not to use the weight-decomposed lora method (DoRA)."}
+    )
     create_new_adapter: Optional[bool] = field(
         default=False,
         metadata={"help": "Whether or not to create a new adapter with randomly initialized weight."},
@@ -94,7 +93,7 @@ class RLHFArguments:
         default=0.1,
         metadata={"help": "The beta parameter for the DPO loss."},
     )
-    dpo_loss: Optional[Literal["sigmoid", "hinge", "ipo", "kto"]] = field(
+    dpo_loss: Optional[Literal["sigmoid", "hinge", "ipo", "kto_pair"]] = field(
         default="sigmoid",
         metadata={"help": "The type of DPO loss to use."},
     )
@@ -170,6 +169,10 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments):
         default="lora",
         metadata={"help": "Which fine-tuning method to use."},
     )
+    use_llama_pro: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether or not to make only the parameters in the expanded blocks trainable."},
+    )
     disable_version_checking: Optional[bool] = field(
         default=False,
         metadata={"help": "Whether or not to disable version checking."},
@@ -195,10 +198,13 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments):
         assert self.reward_model_quantization_bit in [None, 8, 4], "We only accept 4-bit or 8-bit quantization."
 
         if self.stage == "ppo" and self.reward_model is None:
-            raise ValueError("Reward model is necessary for PPO training.")
+            raise ValueError("`reward_model` is necessary for PPO training.")
 
         if self.stage == "ppo" and self.reward_model_type == "lora" and self.finetuning_type != "lora":
-            raise ValueError("Freeze/Full PPO training needs `reward_model_type=full`.")
+            raise ValueError("`reward_model_type` cannot be lora for Freeze/Full PPO training.")
+
+        if self.use_llama_pro and self.finetuning_type == "full":
+            raise ValueError("`use_llama_pro` is only valid for the Freeze or LoRA method.")
 
     def save_to_json(self, json_path: str):
         r"""Saves the content of this instance in JSON format inside `json_path`."""

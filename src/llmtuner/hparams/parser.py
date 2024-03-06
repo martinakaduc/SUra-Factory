@@ -3,7 +3,6 @@ import os
 import sys
 from typing import Any, Dict, Optional, Tuple
 
-import datasets
 import torch
 import transformers
 from transformers import HfArgumentParser, Seq2SeqTrainingArguments
@@ -36,9 +35,9 @@ def _check_dependencies(disabled: bool) -> None:
     else:
         require_version("transformers>=4.37.2", "To fix: pip install transformers>=4.37.2")
         require_version("datasets>=2.14.3", "To fix: pip install datasets>=2.14.3")
-        require_version("accelerate>=0.21.0", "To fix: pip install accelerate>=0.21.0")
-        require_version("peft>=0.8.2", "To fix: pip install peft>=0.8.2")
-        require_version("trl>=0.7.6", "To fix: pip install trl>=0.7.6")
+        require_version("accelerate>=0.27.2", "To fix: pip install accelerate>=0.27.2")
+        require_version("peft>=0.9.0", "To fix: pip install peft>=0.9.0")
+        require_version("trl>=0.7.11", "To fix: pip install trl>=0.7.11")
 
 
 def _parse_args(parser: "HfArgumentParser", args: Optional[Dict[str, Any]] = None) -> Tuple[Any]:
@@ -62,7 +61,6 @@ def _parse_args(parser: "HfArgumentParser", args: Optional[Dict[str, Any]] = Non
 
 
 def _set_transformers_logging(log_level: Optional[int] = logging.INFO) -> None:
-    datasets.utils.logging.set_verbosity(log_level)
     transformers.utils.logging.set_verbosity(log_level)
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
@@ -144,7 +142,14 @@ def get_train_args(args: Optional[Dict[str, Any]] = None) -> _TRAIN_CLS:
         raise ValueError("Please specify `lora_target` in LoRA training.")
 
     if training_args.do_train and model_args.use_unsloth and not is_unsloth_available:
-        raise ValueError("Install Unsloth: https://github.com/unslothai/unsloth")
+        raise ValueError("Unsloth was not installed: https://github.com/unslothai/unsloth")
+
+    if finetuning_args.use_dora:
+        if model_args.quantization_bit is not None:
+            raise ValueError("DoRA does not support quantization.")
+
+        if model_args.use_unsloth:
+            raise ValueError("Unsloth does not support DoRA.")
 
     _verify_model_args(model_args, finetuning_args)
     _check_dependencies(disabled=finetuning_args.disable_version_checking)
@@ -176,9 +181,7 @@ def get_train_args(args: Optional[Dict[str, Any]] = None) -> _TRAIN_CLS:
         and finetuning_args.finetuning_type == "lora"
     ):
         logger.warning("`ddp_find_unused_parameters` needs to be set as False for LoRA in DDP training.")
-        training_args_dict = training_args.to_dict()
-        training_args_dict.update(dict(ddp_find_unused_parameters=False))
-        training_args = Seq2SeqTrainingArguments(**training_args_dict)
+        training_args.ddp_find_unused_parameters = False
 
     if finetuning_args.stage in ["rm", "ppo"] and finetuning_args.finetuning_type in ["full", "freeze"]:
         can_resume_from_checkpoint = False
@@ -200,9 +203,7 @@ def get_train_args(args: Optional[Dict[str, Any]] = None) -> _TRAIN_CLS:
             raise ValueError("Output directory already exists and is not empty. Please set `overwrite_output_dir`.")
 
         if last_checkpoint is not None:
-            training_args_dict = training_args.to_dict()
-            training_args_dict.update(dict(resume_from_checkpoint=last_checkpoint))
-            training_args = Seq2SeqTrainingArguments(**training_args_dict)
+            training_args.resume_from_checkpoint = last_checkpoint
             logger.info(
                 "Resuming training from {}. Change `output_dir` or use `overwrite_output_dir` to avoid.".format(
                     training_args.resume_from_checkpoint
@@ -225,10 +226,11 @@ def get_train_args(args: Optional[Dict[str, Any]] = None) -> _TRAIN_CLS:
         torch.bfloat16 if training_args.bf16 else (torch.float16 if training_args.fp16 else None)
     )
     model_args.model_max_length = data_args.cutoff_len
+    model_args.aqlm_optimization = not training_args.predict_with_generate
 
     # Log on each process the small summary:
     logger.info(
-        "Process rank: {}, device: {}, n_gpu: {}\n  distributed training: {}, compute dtype: {}".format(
+        "Process rank: {}, device: {}, n_gpu: {}, distributed training: {}, compute dtype: {}".format(
             training_args.local_rank,
             training_args.device,
             training_args.n_gpu,
@@ -236,7 +238,6 @@ def get_train_args(args: Optional[Dict[str, Any]] = None) -> _TRAIN_CLS:
             str(model_args.compute_dtype),
         )
     )
-    logger.info(f"Training/evaluation parameters {training_args}")
 
     transformers.set_seed(training_args.seed)
 
@@ -262,6 +263,7 @@ def get_eval_args(args: Optional[Dict[str, Any]] = None) -> _EVAL_CLS:
     _set_transformers_logging()
     _verify_model_args(model_args, finetuning_args)
     _check_dependencies(disabled=finetuning_args.disable_version_checking)
+    model_args.aqlm_optimization = True
 
     if data_args.template is None:
         raise ValueError("Please specify which `template` to use.")

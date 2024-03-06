@@ -452,6 +452,20 @@ LOCALES = {
             "info": "嵌入向量所添加的噪声大小。",
         },
     },
+    "resize_vocab": {
+        "en": {
+            "label": "Resize token embeddings",
+            "info": "Resize the tokenizer vocab and the embedding layers.",
+        },
+        "ru": {
+            "label": "Изменение размера токенных эмбеддингов",
+            "info": "Изменить размер словаря токенизатора и слоев эмбеддинга.",
+        },
+        "zh": {
+            "label": "更改词表大小",
+            "info": "更改分词器词表和嵌入层的大小。",
+        },
+    },
     "sft_packing": {
         "en": {
             "label": "Pack sequences",
@@ -463,7 +477,7 @@ LOCALES = {
         },
         "zh": {
             "label": "序列打包",
-            "info": "在指令监督微调阶段将序列打包为相同长度的样本。",
+            "info": "在指令监督微调时将序列打包为等长样本。",
         },
     },
     "upcast_layernorm": {
@@ -478,6 +492,59 @@ LOCALES = {
         "zh": {
             "label": "缩放归一化层",
             "info": "将归一化层权重缩放至 32 位精度。",
+        },
+    },
+    "use_llama_pro": {
+        "en": {
+            "label": "Enable LLaMA Pro",
+            "info": "Make the parameters in the expanded blocks trainable.",
+        },
+        "ru": {
+            "label": "Включить LLaMA Pro",
+            "info": "Сделать параметры в расширенных блоках обучаемыми.",
+        },
+        "zh": {
+            "label": "使用 LLaMA Pro",
+            "info": "仅训练块扩展后的参数。",
+        },
+    },
+    "freeze_tab": {
+        "en": {
+            "label": "Freeze tuning configurations",
+        },
+        "ru": {
+            "label": "конфигурации для настройки заморозки",
+        },
+        "zh": {
+            "label": "部分参数微调设置",
+        },
+    },
+    "num_layer_trainable": {
+        "en": {
+            "label": "Trainable layers",
+            "info": "The number of trainable layers.",
+        },
+        "ru": {
+            "label": "Обучаемые слои",
+            "info": "Количество обучаемых слоев.",
+        },
+        "zh": {
+            "label": "可训练层数",
+            "info": "可训练模型层的数量。",
+        },
+    },
+    "name_module_trainable": {
+        "en": {
+            "label": "Trainable modules",
+            "info": "The name of trainable modules. Use commas to separate multiple modules.",
+        },
+        "ru": {
+            "label": "Обучаемые модули",
+            "info": "Название обучаемых модулей. Используйте запятые для разделения нескольких модулей.",
+        },
+        "zh": {
+            "label": "可训练模块",
+            "info": "可训练模块的名称。使用英文逗号分隔多个名称。",
         },
     },
     "lora_tab": {
@@ -503,6 +570,20 @@ LOCALES = {
         "zh": {
             "label": "LoRA 秩",
             "info": "LoRA 矩阵的秩。",
+        },
+    },
+    "lora_alpha": {
+        "en": {
+            "label": "LoRA Alpha",
+            "info": "Lora scaling coefficient.",
+        },
+        "ru": {
+            "label": "LoRA Alpha",
+            "info": "Коэффициент масштабирования LoRA.",
+        },
+        "zh": {
+            "label": "LoRA 缩放系数",
+            "info": "LoRA 缩放系数大小。",
         },
     },
     "lora_dropout": {
@@ -533,6 +614,48 @@ LOCALES = {
             "info": "应用 LoRA 的目标模块名称。使用英文逗号分隔多个名称。",
         },
     },
+    "use_rslora": {
+        "en": {
+            "label": "Use rslora",
+            "info": "Use the rank stabilization scaling factor for LoRA layer.",
+        },
+        "ru": {
+            "label": "Использовать rslora",
+            "info": "Использовать коэффициент масштабирования стабилизации ранга для слоя LoRA.",
+        },
+        "zh": {
+            "label": "使用 rslora",
+            "info": "对 LoRA 层使用秩稳定缩放方法。",
+        },
+    },
+    "use_dora": {
+        "en": {
+            "label": "Use DoRA",
+            "info": "Use weight-decomposed LoRA.",
+        },
+        "ru": {
+            "label": "Используйте DoRA",
+            "info": "Используйте LoRA с декомпозицией весов.",
+        },
+        "zh": {
+            "label": "使用 DoRA",
+            "info": "使用权重分解的 LoRA。",
+        },
+    },
+    "create_new_adapter": {
+        "en": {
+            "label": "Create new adapter",
+            "info": "Create a new adapter with randomly initialized weight upon the existing one.",
+        },
+        "ru": {
+            "label": "Создать новый адаптер",
+            "info": "Создать новый адаптер с случайной инициализацией веса на основе существующего.",
+        },
+        "zh": {
+            "label": "新建适配器",
+            "info": "在现有的适配器上创建一个随机初始化后的新适配器。",
+        },
+    },
     "additional_target": {
         "en": {
             "label": "Additional modules (optional)",
@@ -548,20 +671,6 @@ LOCALES = {
         "zh": {
             "label": "附加模块（非必填）",
             "info": "除 LoRA 层以外的可训练模块名称。使用英文逗号分隔多个名称。",
-        },
-    },
-    "create_new_adapter": {
-        "en": {
-            "label": "Create new adapter",
-            "info": "Whether to create a new adapter with randomly initialized weight or not.",
-        },
-        "ru": {
-            "label": "Создать новый адаптер",
-            "info": "Создать новый адаптер с случайной инициализацией веса или нет.",
-        },
-        "zh": {
-            "label": "新建适配器",
-            "info": "是否创建一个经过随机初始化的新适配器。",
         },
     },
     "rlhf_tab": {
@@ -730,6 +839,17 @@ LOCALES = {
             "value": "模型未加载，请先加载模型。",
         },
     },
+    "role": {
+        "en": {
+            "label": "Role",
+        },
+        "ru": {
+            "label": "Роль",
+        },
+        "zh": {
+            "label": "角色",
+        },
+    },
     "system": {
         "en": {
             "placeholder": "System prompt (optional)",
@@ -772,17 +892,6 @@ LOCALES = {
         },
         "zh": {
             "value": "提交",
-        },
-    },
-    "clear_btn": {
-        "en": {
-            "value": "Clear history",
-        },
-        "ru": {
-            "value": "Очистить историю",
-        },
-        "zh": {
-            "value": "清空历史",
         },
     },
     "max_length": {
@@ -829,6 +938,17 @@ LOCALES = {
             "label": "温度系数",
         },
     },
+    "clear_btn": {
+        "en": {
+            "value": "Clear history",
+        },
+        "ru": {
+            "value": "Очистить историю",
+        },
+        "zh": {
+            "value": "清空历史",
+        },
+    },
     "max_shard_size": {
         "en": {
             "label": "Max shard size (GB)",
@@ -859,7 +979,7 @@ LOCALES = {
     },
     "export_quantization_dataset": {
         "en": {
-            "label": "Export quantization dataset.",
+            "label": "Export quantization dataset",
             "info": "The calibration dataset used for quantization.",
         },
         "ru": {
@@ -869,6 +989,20 @@ LOCALES = {
         "zh": {
             "label": "导出量化数据集",
             "info": "量化过程中使用的校准数据集。",
+        },
+    },
+    "export_legacy_format": {
+        "en": {
+            "label": "Export legacy format",
+            "info": "Do not use safetensors to save the model.",
+        },
+        "ru": {
+            "label": "Экспорт в устаревший формат",
+            "info": "Не использовать safetensors для сохранения модели.",
+        },
+        "zh": {
+            "label": "导出旧格式",
+            "info": "不使用 safetensors 格式保存模型。",
         },
     },
     "export_dir": {
@@ -883,6 +1017,20 @@ LOCALES = {
         "zh": {
             "label": "导出目录",
             "info": "保存导出模型的文件夹路径。",
+        },
+    },
+    "export_hub_model_id": {
+        "en": {
+            "label": "HF Hub ID (optional)",
+            "info": "Repo ID for uploading model to Hugging Face hub.",
+        },
+        "ru": {
+            "label": "HF Hub ID (опционально)",
+            "info": "Идентификатор репозитория для загрузки модели на Hugging Face hub.",
+        },
+        "zh": {
+            "label": "HF Hub ID（非必填）",
+            "info": "用于将模型上传至 Hugging Face Hub 的仓库 ID。",
         },
     },
     "export_btn": {
@@ -959,6 +1107,11 @@ ALERTS = {
         "en": "Invalid JSON schema.",
         "ru": "Неверная схема JSON.",
         "zh": "Json 格式错误。",
+    },
+    "warn_no_cuda": {
+        "en": "CUDA environment was not detected.",
+        "ru": "Среда CUDA не обнаружена.",
+        "zh": "未检测到 CUDA 环境。",
     },
     "info_aborting": {
         "en": "Aborted, wait for terminating...",
